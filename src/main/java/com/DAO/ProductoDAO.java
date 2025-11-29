@@ -29,7 +29,7 @@ public class ProductoDAO {
                 producto.setCategoria(rs.getString("categoria")); 
                 producto.setUnidad_medida(rs.getString("unidad_medida"));
                 producto.setExitencia(rs.getInt("existencia"));
-                producto.setPrecio_v(rs.getDouble("precio_c"));
+                producto.setPrecio_c(rs.getDouble("precio_c"));
                 producto.setPrecio_v(rs.getDouble("precio_v"));
             }
         }

@@ -1,4 +1,4 @@
-package views;
+package com.views;
 
 import com.model.Usuario;
 import java.awt.Color;

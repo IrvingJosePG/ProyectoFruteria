@@ -1,18 +1,35 @@
-package views;
+package com.views;
 
+import com.DAO.ClienteDAO;
 import com.DAO.ProductoDAO;
+import com.model.Cliente;
+import com.model.DetalleVentaTemporal;
 import com.model.Producto;
 import com.model.Usuario;
+import java.awt.List;
+import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.table.DefaultTableModel;
 
 public class PuntoVenta extends javax.swing.JPanel {
 
     private Usuario usuarioActual;
+    private Producto productoActual;
+    private DefaultTableModel modeloCarrito; 
+    private double totalVentaAcumulado = 0.0; 
+    private java.util.List<DetalleVentaTemporal> detallesVenta;
     
     public PuntoVenta(Usuario user) {
         this.usuarioActual = user;
         initComponents();
+        casillavendido.setEnabled(false);
+        
+        modeloCarrito = (DefaultTableModel) tabladecarrito.getModel();
+        detallesVenta = new ArrayList<>();
+        
+        modeloCarrito.setColumnIdentifiers(new Object[]{"Producto", "Cantidad", "Precio Unitario", "Subtotal"});
+        cargarClientes();
     }
 
     private void buscarProducto() {
@@ -37,7 +54,7 @@ public class PuntoVenta extends javax.swing.JPanel {
             Producto productoEncontrado = dao.buscarProductoPorCodigo(codigo); 
 
             if (productoEncontrado != null) {
-
+                this.productoActual = productoEncontrado;
                 nombreproducto.setText(productoEncontrado.getDescripcion());
                 categoriaproducto.setText(productoEncontrado.getCategoria());
 
@@ -48,6 +65,14 @@ public class PuntoVenta extends javax.swing.JPanel {
                 productoprecioc.setText(preciocFormateado); 
 
                 configurarLimiteCantidad(productoEncontrado.getExitencia());
+                
+                int stock = productoEncontrado.getExitencia();
+                boolean hayStock = stock > 0;
+                // Se marca si hay stock, se desmarca si es 0
+                casillavendido.setSelected(hayStock); 
+                casillavendido.setEnabled(false); 
+                configurarLimiteCantidad(stock);
+    
             } else {
                 JOptionPane.showMessageDialog(this, "Código no válido. Producto no encontrado en el inventario.", "Búsqueda Fallida", JOptionPane.ERROR_MESSAGE);
                 limpiarCamposProducto();
@@ -64,8 +89,11 @@ public class PuntoVenta extends javax.swing.JPanel {
 
     // Para resetear los campos
     private void limpiarCamposProducto() {
-        nombreproducto.setText("---");
-        // Restablecer categoriaproducto, productoprecio, etc.
+        nombreproducto.setText("-----");
+        categoriaproducto.setText("-----");
+        productopreciov.setText("-----"); 
+        productoprecioc.setText("-----");
+        casillavendido.setEnabled(false); 
     }
     
     private void configurarLimiteCantidad(int maxStock) {
@@ -84,6 +112,65 @@ public class PuntoVenta extends javax.swing.JPanel {
 
         if (maxStock == 0) {
             JOptionPane.showMessageDialog(this, "¡Advertencia! El producto seleccionado no tiene existencia.", "Sin Stock", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+    
+    private void agregarAlCarrito() {
+        if (productoActual == null) {
+            JOptionPane.showMessageDialog(this, "Debe buscar y cargar un producto primero.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+
+        int cantidad = (Integer) cantidadvendida.getValue();
+    
+        if (cantidad <= 0 || cantidad > productoActual.getExitencia()) {
+            JOptionPane.showMessageDialog(this, "Cantidad no válida o excede la existencia (" + productoActual.getExitencia() + ").", "Error de Stock", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // 4. Cálculos
+        double precioUnitario = productoActual.getPrecio_v();
+        double subtotal = precioUnitario * cantidad;
+    
+  
+        Object[] fila = new Object[]{
+            productoActual.getDescripcion(), // Necesitas el ID real del producto para la DB
+            cantidad,
+            String.format("%.2f", precioUnitario),
+            String.format("%.2f", subtotal)
+        };
+        modeloCarrito.addRow(fila);
+    
+  
+    
+        detallesVenta.add(new DetalleVentaTemporal(productoActual.getCodigo(), productoActual.getDescripcion(), cantidad, precioUnitario, subtotal));
+    
+   
+        actualizarTotalVenta(subtotal);
+    
+    
+        limpiarCamposProducto();
+        productoActual = null;
+    }
+
+    private void actualizarTotalVenta(double subtotalNuevo) {
+        totalVentaAcumulado += subtotalNuevo;
+        totalventa.setText(String.format("%.2f", totalVentaAcumulado));
+    }
+    
+    private void cargarClientes() {
+        try {
+            ClienteDAO dao = new ClienteDAO();
+            java.util.List<Cliente> clientes = dao.listarClientes();
+
+            clienteregistrados.removeAllItems(); 
+            for (Cliente cliente : clientes) {
+                clienteregistrados.addItem(cliente.toString());
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar la lista de clientes: " + e.getMessage(), "Error de Carga", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -152,7 +239,7 @@ public class PuntoVenta extends javax.swing.JPanel {
         add(separadorbusque, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 35, 150, -1));
 
         nombreproducto.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
-        nombreproducto.setText("Pera");
+        nombreproducto.setText("-----");
         add(nombreproducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 60, -1, -1));
 
         txtnombre.setText("Nombre:");
@@ -162,21 +249,21 @@ public class PuntoVenta extends javax.swing.JPanel {
         add(txtcategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, -1));
 
         categoriaproducto.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
-        categoriaproducto.setText("Fruta");
+        categoriaproducto.setText("-----");
         add(categoriaproducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 90, -1, -1));
 
         txtcantidad.setText("Cantidad:");
-        add(txtcantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 60, -1, 20));
+        add(txtcantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 60, -1, 20));
 
         productopreciov.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
-        productopreciov.setText("88.90");
+        productopreciov.setText("-----");
         add(productopreciov, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 120, -1, -1));
 
         casillavendido.setText("Puede ser vendido");
-        add(casillavendido, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 100, 150, 20));
+        add(casillavendido, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 100, 150, 20));
 
         cantidadvendida.setToolTipText("");
-        add(cantidadvendida, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 60, -1, 20));
+        add(cantidadvendida, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 60, -1, 20));
 
         txtprecioventa.setText("Precio Venta:");
         add(txtprecioventa, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, -1, -1));
@@ -206,7 +293,6 @@ public class PuntoVenta extends javax.swing.JPanel {
         totalventa.setText("0.0");
         add(totalventa, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 300, -1, -1));
 
-        clienteregistrados.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         add(clienteregistrados, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 300, 150, 20));
 
         txtcliente.setText("Cliente:");
@@ -240,6 +326,11 @@ public class PuntoVenta extends javax.swing.JPanel {
         agregaralcarrito.setForeground(new java.awt.Color(255, 255, 255));
         agregaralcarrito.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         agregaralcarrito.setText("Agregar al carrito");
+        agregaralcarrito.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                agregaralcarritoMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlcarritoLayout = new javax.swing.GroupLayout(pnlcarrito);
         pnlcarrito.setLayout(pnlcarritoLayout);
@@ -289,7 +380,7 @@ public class PuntoVenta extends javax.swing.JPanel {
         add(txtpreciocompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, -1, -1));
 
         productoprecioc.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
-        productoprecioc.setText("88.90");
+        productoprecioc.setText("-----");
         add(productoprecioc, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 150, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
@@ -316,6 +407,10 @@ public class PuntoVenta extends javax.swing.JPanel {
             busquedafolio.setForeground(new java.awt.Color(204, 204, 204));
         }
     }//GEN-LAST:event_busquedafolioFocusLost
+
+    private void agregaralcarritoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_agregaralcarritoMouseClicked
+        agregarAlCarrito();
+    }//GEN-LAST:event_agregaralcarritoMouseClicked
 
     
 

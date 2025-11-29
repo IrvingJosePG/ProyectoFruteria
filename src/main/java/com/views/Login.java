@@ -1,4 +1,4 @@
-package views;
+package com.views;
 
 import com.DAO.UsuarioDAO;
 import java.awt.Image;

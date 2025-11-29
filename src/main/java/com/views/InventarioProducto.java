@@ -1,4 +1,4 @@
-package views;
+package com.views;
 
 import javax.swing.table.DefaultTableModel;
 
