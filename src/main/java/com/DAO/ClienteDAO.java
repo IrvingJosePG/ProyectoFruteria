@@ -14,9 +14,12 @@ public class ClienteDAO {
     public List<Cliente> listarClientes() {
         List<Cliente> clientes = new ArrayList<>();
         
-        String sql = "SELECT id_c, COALESCE(pf.nombre, pm.razon_social) AS nombre_cliente"
-                + "FROM fruteria.cliente NATURAL JOIN p_fisica pf NATURAL JOIN p_moral pm "
-                + "ORDER BY nombre";
+        String sql = "SELECT c.id_c, " 
+               + "COALESCE(pf.nombre, pm.razon_social) AS nombre_cliente "
+               + "FROM fruteria.cliente c "
+               + "LEFT JOIN fruteria.p_fisica pf ON c.id_c = pf.id_c "
+               + "LEFT JOIN fruteria.p_moral pm ON c.id_c = pm.id_c "
+               + "ORDER BY nombre_cliente;";
         
         try (Connection conn = Conexion.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
