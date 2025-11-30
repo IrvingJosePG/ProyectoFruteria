@@ -2,11 +2,14 @@ package com.views;
 
 import com.DAO.ClienteDAO;
 import com.DAO.ProductoDAO;
+import com.DAO.VentaDAO;
 import com.model.Cliente;
 import com.model.DetalleVentaTemporal;
 import com.model.Producto;
 import com.model.Usuario;
+import com.model.Venta;
 import java.awt.List;
+import java.time.LocalDate;
 import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.SpinnerNumberModel;
@@ -19,6 +22,7 @@ public class PuntoVenta extends javax.swing.JPanel {
     private DefaultTableModel modeloCarrito; 
     private double totalVentaAcumulado = 0.0; 
     private java.util.List<DetalleVentaTemporal> detallesVenta;
+    private javax.swing.JComboBox<com.model.Cliente> clienteregistrados;
     
     public PuntoVenta(Usuario user) {
         this.usuarioActual = user;
@@ -93,7 +97,9 @@ public class PuntoVenta extends javax.swing.JPanel {
         categoriaproducto.setText("-----");
         productopreciov.setText("-----"); 
         productoprecioc.setText("-----");
-        casillavendido.setEnabled(false); 
+        casillavendido.setEnabled(false);
+        casillavendido.setSelected(false);
+        busquedafolio.setText("");
     }
     
     private void configurarLimiteCantidad(int maxStock) {
@@ -121,7 +127,6 @@ public class PuntoVenta extends javax.swing.JPanel {
             return;
         }
 
-
         int cantidad = (Integer) cantidadvendida.getValue();
     
         if (cantidad <= 0 || cantidad > productoActual.getExitencia()) {
@@ -133,7 +138,6 @@ public class PuntoVenta extends javax.swing.JPanel {
         double precioUnitario = productoActual.getPrecio_v();
         double subtotal = precioUnitario * cantidad;
     
-  
         Object[] fila = new Object[]{
             productoActual.getDescripcion(), // Necesitas el ID real del producto para la DB
             cantidad,
@@ -142,13 +146,9 @@ public class PuntoVenta extends javax.swing.JPanel {
         };
         modeloCarrito.addRow(fila);
     
-  
-    
         detallesVenta.add(new DetalleVentaTemporal(productoActual.getCodigo(), productoActual.getDescripcion(), cantidad, precioUnitario, subtotal));
     
-   
         actualizarTotalVenta(subtotal);
-    
     
         limpiarCamposProducto();
         productoActual = null;
@@ -164,17 +164,19 @@ public class PuntoVenta extends javax.swing.JPanel {
             ClienteDAO dao = new ClienteDAO();
             java.util.List<Cliente> clientes = dao.listarClientes();
 
-            clienteregistrados.removeAllItems(); 
+            clienteregistrados1.removeAllItems(); 
+            
+            Cliente clienteDefault = new Cliente(0, " ", " ", " " , "Cargar Cliente");
+            clienteregistrados1.addItem(clienteDefault);
+            
             for (Cliente cliente : clientes) {
-                clienteregistrados.addItem(cliente.toString());
+                clienteregistrados1.addItem(cliente);
             }
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al cargar la lista de clientes: " + e.getMessage(), "Error de Carga", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    
+    }  
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -202,7 +204,6 @@ public class PuntoVenta extends javax.swing.JPanel {
         tabladecarrito = new javax.swing.JTable();
         txttotalventa = new javax.swing.JLabel();
         totalventa = new javax.swing.JLabel();
-        clienteregistrados = new javax.swing.JComboBox<>();
         txtcliente = new javax.swing.JLabel();
         panelfinalizarventa = new javax.swing.JPanel();
         finalizarventa = new javax.swing.JLabel();
@@ -212,6 +213,7 @@ public class PuntoVenta extends javax.swing.JPanel {
         buscar = new javax.swing.JLabel();
         txtpreciocompra = new javax.swing.JLabel();
         productoprecioc = new javax.swing.JLabel();
+        clienteregistrados1 = new javax.swing.JComboBox<>();
 
         setBackground(new java.awt.Color(252, 249, 235));
         setPreferredSize(new java.awt.Dimension(300, 300));
@@ -293,8 +295,6 @@ public class PuntoVenta extends javax.swing.JPanel {
         totalventa.setText("0.0");
         add(totalventa, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 300, -1, -1));
 
-        add(clienteregistrados, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 300, 150, 20));
-
         txtcliente.setText("Cliente:");
         add(txtcliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 300, -1, 20));
 
@@ -305,6 +305,11 @@ public class PuntoVenta extends javax.swing.JPanel {
         finalizarventa.setForeground(new java.awt.Color(255, 255, 255));
         finalizarventa.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         finalizarventa.setText("Finalizar Venta");
+        finalizarventa.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                finalizarventaMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelfinalizarventaLayout = new javax.swing.GroupLayout(panelfinalizarventa);
         panelfinalizarventa.setLayout(panelfinalizarventaLayout);
@@ -382,6 +387,8 @@ public class PuntoVenta extends javax.swing.JPanel {
         productoprecioc.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
         productoprecioc.setText("-----");
         add(productoprecioc, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 150, -1, -1));
+
+        add(clienteregistrados1, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 300, 250, 20));
     }// </editor-fold>//GEN-END:initComponents
 
     private void buscarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buscarMouseClicked
@@ -412,6 +419,52 @@ public class PuntoVenta extends javax.swing.JPanel {
         agregarAlCarrito();
     }//GEN-LAST:event_agregaralcarritoMouseClicked
 
+    private void finalizarventaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_finalizarventaMouseClicked
+        // 1. Validaciones
+        if (detallesVenta.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El carrito está vacío.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Cliente clienteSeleccionado = (Cliente) clienteregistrados1.getSelectedItem();
+        if (clienteSeleccionado == null || clienteSeleccionado.getId_c() == 0) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un cliente válido.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // 2. Crear Objeto Venta (Encabezado)
+        Venta venta = new Venta();
+        venta.setFecha(LocalDate.now()); 
+        venta.setIdCliente(clienteSeleccionado.getId_c());
+        // **CRÍTICO**: Asumimos que tienes una variable 'usuarioActual' con el empleado logueado
+        venta.setIdEmpleado(usuarioActual.getIdEmpleado()); 
+
+        // 3. Ejecutar Transacción
+        VentaDAO dao = new VentaDAO();
+        boolean exito = dao.registrarVentaTransaccion(venta, detallesVenta);
+
+        if (exito) {
+            JOptionPane.showMessageDialog(this, "Venta registrada con FOLIO: " + venta.getFolioV(), "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            limpiarCarrito();
+        } else {
+            JOptionPane.showMessageDialog(this, "Fallo al registrar la venta. Verifique los logs de error.", "Error Transaccional", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_finalizarventaMouseClicked
+
+    public void limpiarCarrito() {
+    DefaultTableModel modelo = (DefaultTableModel) tabladecarrito.getModel();
+    while (modelo.getRowCount() > 0) {
+        modelo.removeRow(0);
+    }
+    if (detallesVenta != null) {
+        detallesVenta.clear();
+    }
+    
+    totalVentaAcumulado = 0.0;
+    
+    totalventa.setText("0.00"); 
+    clienteregistrados1.setSelectedIndex(0); 
+}
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -422,7 +475,7 @@ public class PuntoVenta extends javax.swing.JPanel {
     private javax.swing.JSpinner cantidadvendida;
     private javax.swing.JCheckBox casillavendido;
     private javax.swing.JLabel categoriaproducto;
-    private javax.swing.JComboBox<String> clienteregistrados;
+    private javax.swing.JComboBox<com.model.Cliente> clienteregistrados1;
     private javax.swing.JLabel finalizarventa;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel nombreproducto;
