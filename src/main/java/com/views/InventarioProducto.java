@@ -1,29 +1,64 @@
 package com.views;
 
+import com.DAO.ProductoDAO;
+import com.model.Producto;
+import com.model.Usuario;
+import java.sql.SQLException;
+import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class InventarioProducto extends javax.swing.JPanel {
+    
+    private DefaultTableModel modeloProducto;
+    private ProductoDAO productoDAO = new ProductoDAO();
 
-    public InventarioProducto() {
+    public InventarioProducto(Usuario user) {
         initComponents();
-        table();
+        configurarTabla();
+        cargarDatosTabla(); // ¡Esto llenará la tabla al abrir el panel!
     }
     
-    public void table() {
-        String[] columnNames = {"Codigo", "Nombre", "Categoria", "Precio_C", "Precio_V", "Stock"};
+    public void configurarTabla() {
+        String[] columnNames = {"ID", "Nombre", "Categoria", "U. Medida", "Stock" , "Precio C", "Precio V"};
 
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        this.modeloProducto = new DefaultTableModel(columnNames, 0); 
         
-        tableproductos.setModel(tableModel);
+        tableproductos.setModel(this.modeloProducto);
         tableproductos.getTableHeader().setResizingAllowed(true);
-        
-        tableproductos.getColumnModel().getColumn(0).setPreferredWidth(50);
-        tableproductos.getColumnModel().getColumn(1).setPreferredWidth(140); 
-        tableproductos.getColumnModel().getColumn(2).setPreferredWidth(130); 
-        tableproductos.getColumnModel().getColumn(3).setPreferredWidth(60); 
-        tableproductos.getColumnModel().getColumn(4).setPreferredWidth(60);
-        tableproductos.getColumnModel().getColumn(5).setPreferredWidth(50);
+
+        tableproductos.getColumnModel().getColumn(0).setPreferredWidth(40);
+        tableproductos.getColumnModel().getColumn(1).setPreferredWidth(130);
+        tableproductos.getColumnModel().getColumn(2).setPreferredWidth(75);
+        tableproductos.getColumnModel().getColumn(3).setPreferredWidth(85);
+        tableproductos.getColumnModel().getColumn(4).setPreferredWidth(50); 
+        tableproductos.getColumnModel().getColumn(5).setPreferredWidth(55);
+        tableproductos.getColumnModel().getColumn(6).setPreferredWidth(55);
     }
+    
+    public void cargarDatosTabla() {
+        try {
+            List<Producto> lista = productoDAO.listarProductos();
+
+            for (Producto p : lista) {
+                modeloProducto.addRow(new Object[]{
+                    p.getCodigo(),
+                    p.getDescripcion(),
+                    p.getCategoria(),
+                    p.getUnidad_medida(), // Asegúrate de incluir este campo en tu vista
+                    p.getExitencia(),
+                    p.getPrecio_c(),
+                    p.getPrecio_v()
+                });
+            }
+            tableproductos.setModel(modeloProducto);
+        } catch (SQLException e) {
+            // Manejar el error de conexión o consulta.
+            JOptionPane.showMessageDialog(this, "Error al cargar productos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -36,27 +71,29 @@ public class InventarioProducto extends javax.swing.JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         tableproductos = new javax.swing.JTable();
-        jSeparator1 = new javax.swing.JSeparator();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel14 = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel15 = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jPanel6 = new javax.swing.JPanel();
-        jLabel17 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jSpinner1 = new javax.swing.JSpinner();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
+        separador = new javax.swing.JSeparator();
+        pnlguardar = new javax.swing.JPanel();
+        buttonsave = new javax.swing.JLabel();
+        pnleditar = new javax.swing.JPanel();
+        buttonedit = new javax.swing.JLabel();
+        pnleliminar = new javax.swing.JPanel();
+        buttondelete = new javax.swing.JLabel();
+        pnllimpiar = new javax.swing.JPanel();
+        buttonclear = new javax.swing.JLabel();
+        txtnombre = new javax.swing.JLabel();
+        txtcodigo = new javax.swing.JLabel();
+        textcat = new javax.swing.JLabel();
+        txtcantidad = new javax.swing.JLabel();
+        txtpreciov = new javax.swing.JLabel();
+        txtprecioc = new javax.swing.JLabel();
+        fieldproducto = new javax.swing.JTextField();
+        fieldcodigo = new javax.swing.JTextField();
+        cantidad = new javax.swing.JSpinner();
+        categorias = new javax.swing.JComboBox<>();
+        precioc = new javax.swing.JTextField();
+        preciov = new javax.swing.JTextField();
+        textunidadmedida = new javax.swing.JLabel();
+        unidadmedidafield = new javax.swing.JComboBox<>();
 
         setBackground(new java.awt.Color(252, 249, 235));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -76,169 +113,178 @@ public class InventarioProducto extends javax.swing.JPanel {
 
         add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 15, 490, 150));
 
-        jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
-        add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 170, 510, -1));
+        separador.setForeground(new java.awt.Color(0, 0, 0));
+        add(separador, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 170, 510, -1));
 
-        jPanel3.setBackground(new java.awt.Color(124, 123, 174));
+        pnlguardar.setBackground(new java.awt.Color(124, 123, 174));
 
-        jLabel14.setBackground(new java.awt.Color(124, 123, 174));
-        jLabel14.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
-        jLabel14.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel14.setText("GUARDAR");
+        buttonsave.setBackground(new java.awt.Color(124, 123, 174));
+        buttonsave.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
+        buttonsave.setForeground(new java.awt.Color(255, 255, 255));
+        buttonsave.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        buttonsave.setText("GUARDAR");
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        javax.swing.GroupLayout pnlguardarLayout = new javax.swing.GroupLayout(pnlguardar);
+        pnlguardar.setLayout(pnlguardarLayout);
+        pnlguardarLayout.setHorizontalGroup(
+            pnlguardarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(buttonsave, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel14, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
-        );
-
-        add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 100, 25));
-
-        jPanel4.setBackground(new java.awt.Color(124, 123, 174));
-
-        jLabel15.setBackground(new java.awt.Color(124, 123, 174));
-        jLabel15.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
-        jLabel15.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel15.setText("EDITAR");
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel15, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+        pnlguardarLayout.setVerticalGroup(
+            pnlguardarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(buttonsave, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
         );
 
-        add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 180, 100, 25));
+        add(pnlguardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 100, 25));
 
-        jPanel5.setBackground(new java.awt.Color(124, 123, 174));
+        pnleditar.setBackground(new java.awt.Color(124, 123, 174));
 
-        jLabel16.setBackground(new java.awt.Color(124, 123, 174));
-        jLabel16.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
-        jLabel16.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel16.setText("ELIMINAR");
+        buttonedit.setBackground(new java.awt.Color(124, 123, 174));
+        buttonedit.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
+        buttonedit.setForeground(new java.awt.Color(255, 255, 255));
+        buttonedit.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        buttonedit.setText("EDITAR");
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        javax.swing.GroupLayout pnleditarLayout = new javax.swing.GroupLayout(pnleditar);
+        pnleditar.setLayout(pnleditarLayout);
+        pnleditarLayout.setHorizontalGroup(
+            pnleditarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(buttonedit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel16, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
-        );
-
-        add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 180, 100, 25));
-
-        jLabel1.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
-        jLabel1.setText("Nombre:");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 220, 75, 25));
-
-        jLabel2.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
-        jLabel2.setText("Codigo:");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 250, 75, 25));
-
-        jLabel3.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
-        jLabel3.setText("Categoria:");
-        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 280, 75, 25));
-
-        jLabel4.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
-        jLabel4.setText("Cantidad:");
-        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 310, 75, 25));
-
-        jLabel5.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
-        jLabel5.setText("Precio Venta:");
-        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 250, 100, 25));
-
-        jLabel6.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
-        jLabel6.setText("Precio Compra:");
-        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 220, 110, 25));
-
-        jPanel6.setBackground(new java.awt.Color(124, 123, 174));
-
-        jLabel17.setBackground(new java.awt.Color(124, 123, 174));
-        jLabel17.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
-        jLabel17.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel17.setText("LIMPIAR");
-
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel17, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+        pnleditarLayout.setVerticalGroup(
+            pnleditarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(buttonedit, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
         );
 
-        add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 180, 100, 25));
+        add(pnleditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 180, 100, 25));
 
-        jTextField1.setForeground(new java.awt.Color(204, 204, 204));
-        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField1.setText("nombre producto");
-        jTextField1.setBorder(null);
-        add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 220, 150, 25));
+        pnleliminar.setBackground(new java.awt.Color(124, 123, 174));
 
-        jTextField2.setForeground(new java.awt.Color(204, 204, 204));
-        jTextField2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField2.setText("Ingrese codigo");
-        jTextField2.setBorder(null);
-        add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 250, 150, 25));
+        buttondelete.setBackground(new java.awt.Color(124, 123, 174));
+        buttondelete.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
+        buttondelete.setForeground(new java.awt.Color(255, 255, 255));
+        buttondelete.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        buttondelete.setText("ELIMINAR");
 
-        jSpinner1.setBorder(null);
-        add(jSpinner1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 310, 150, 25));
+        javax.swing.GroupLayout pnleliminarLayout = new javax.swing.GroupLayout(pnleliminar);
+        pnleliminar.setLayout(pnleliminarLayout);
+        pnleliminarLayout.setHorizontalGroup(
+            pnleliminarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(buttondelete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        pnleliminarLayout.setVerticalGroup(
+            pnleliminarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(buttondelete, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+        );
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Fruta", "Verdura", "Otros" }));
-        jComboBox1.setBorder(null);
-        add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 280, 150, 25));
+        add(pnleliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 180, 100, 25));
 
-        jTextField3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField3.setBorder(null);
-        add(jTextField3, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 220, 70, 25));
+        pnllimpiar.setBackground(new java.awt.Color(124, 123, 174));
 
-        jTextField4.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField4.setBorder(null);
-        add(jTextField4, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 250, 70, 25));
+        buttonclear.setBackground(new java.awt.Color(124, 123, 174));
+        buttonclear.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
+        buttonclear.setForeground(new java.awt.Color(255, 255, 255));
+        buttonclear.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        buttonclear.setText("LIMPIAR");
+
+        javax.swing.GroupLayout pnllimpiarLayout = new javax.swing.GroupLayout(pnllimpiar);
+        pnllimpiar.setLayout(pnllimpiarLayout);
+        pnllimpiarLayout.setHorizontalGroup(
+            pnllimpiarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(buttonclear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        pnllimpiarLayout.setVerticalGroup(
+            pnllimpiarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(buttonclear, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+        );
+
+        add(pnllimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 180, 100, 25));
+
+        txtnombre.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
+        txtnombre.setText("Nombre:");
+        add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 220, 75, 25));
+
+        txtcodigo.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
+        txtcodigo.setText("Codigo:");
+        add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 250, 75, 25));
+
+        textcat.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
+        textcat.setText("Categoria:");
+        add(textcat, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 280, 75, 25));
+
+        txtcantidad.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
+        txtcantidad.setText("Existencia:");
+        add(txtcantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 310, 75, 25));
+
+        txtpreciov.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
+        txtpreciov.setText("Precio Venta:");
+        add(txtpreciov, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 250, 100, 25));
+
+        txtprecioc.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
+        txtprecioc.setText("Precio Compra:");
+        add(txtprecioc, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 220, 110, 25));
+
+        fieldproducto.setForeground(new java.awt.Color(204, 204, 204));
+        fieldproducto.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        fieldproducto.setText("nombre producto");
+        fieldproducto.setBorder(null);
+        add(fieldproducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 220, 150, 25));
+
+        fieldcodigo.setForeground(new java.awt.Color(204, 204, 204));
+        fieldcodigo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        fieldcodigo.setText("Ingrese codigo");
+        fieldcodigo.setBorder(null);
+        add(fieldcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 250, 150, 25));
+
+        cantidad.setBorder(null);
+        add(cantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 310, 150, 25));
+
+        categorias.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Fruta", "Verdura", "Otros" }));
+        categorias.setBorder(null);
+        add(categorias, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 280, 150, 25));
+
+        precioc.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        precioc.setBorder(null);
+        add(precioc, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 220, 70, 25));
+
+        preciov.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        preciov.setBorder(null);
+        add(preciov, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 250, 70, 25));
+
+        textunidadmedida.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
+        textunidadmedida.setText("Unidad de Medida:");
+        add(textunidadmedida, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 280, 150, 25));
+
+        unidadmedidafield.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pieza", "kilogramo", "otro" }));
+        add(unidadmedidafield, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 310, 175, 25));
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
+    private javax.swing.JLabel buttonclear;
+    private javax.swing.JLabel buttondelete;
+    private javax.swing.JLabel buttonedit;
+    private javax.swing.JLabel buttonsave;
+    private javax.swing.JSpinner cantidad;
+    private javax.swing.JComboBox<String> categorias;
+    private javax.swing.JTextField fieldcodigo;
+    private javax.swing.JTextField fieldproducto;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
+    private javax.swing.JPanel pnleditar;
+    private javax.swing.JPanel pnleliminar;
+    private javax.swing.JPanel pnlguardar;
+    private javax.swing.JPanel pnllimpiar;
+    private javax.swing.JTextField precioc;
+    private javax.swing.JTextField preciov;
+    private javax.swing.JSeparator separador;
     private javax.swing.JTable tableproductos;
+    private javax.swing.JLabel textcat;
+    private javax.swing.JLabel textunidadmedida;
+    private javax.swing.JLabel txtcantidad;
+    private javax.swing.JLabel txtcodigo;
+    private javax.swing.JLabel txtnombre;
+    private javax.swing.JLabel txtprecioc;
+    private javax.swing.JLabel txtpreciov;
+    private javax.swing.JComboBox<String> unidadmedidafield;
     // End of variables declaration//GEN-END:variables
 }

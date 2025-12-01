@@ -25,7 +25,7 @@ public class MenuFruit extends javax.swing.JFrame {
       
         cardLayout = (java.awt.CardLayout) panelcontenedor.getLayout();
         PuntoVenta pnlVentas = new PuntoVenta(usuarioActual); 
-        InventarioProducto pnlProducto = new InventarioProducto();
+        InventarioProducto pnlProducto = new InventarioProducto(usuarioActual);
         panelcontenedor.add(pnlVentas, "Ventas");
         panelcontenedor.add(pnlProducto, "Producto");
     }

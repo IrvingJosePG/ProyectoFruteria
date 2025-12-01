@@ -1,4 +1,4 @@
-package com.model; // Ajusta el paquete según tu proyecto
+package com.model;
 
 public class Producto {
     
