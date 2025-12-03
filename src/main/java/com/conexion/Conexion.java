@@ -7,10 +7,9 @@ import java.sql.SQLException;
 public class Conexion {
     private static Conexion instance;
 
-    // Puedes poner aquí la configuración de la base de datos
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/proyectobd_fruteria";
-    private static final String DB_USER = "postgres";
-    private static final String DB_PASSWORD = "12345678";
+     private static final String DB_URL = "jdbc:postgresql://localhost:5432/proyectobd_fruteria";
+    // Nota: El usuario/contraseña por defecto (postgres/12345678) ya no se usarán para la autenticación, 
+    // pero pueden ser útiles para otras conexiones de administración si es necesario.
 
     // Constructor privado, no inicializa una conexión aquí
     private Conexion() {
@@ -22,22 +21,25 @@ public class Conexion {
         }
     }
 
-    public static Conexion getInstance() { // Ya no lanza SQLException aquí
-        if (instance == null) {
-            synchronized (Conexion.class) {
-                if (instance == null) {
-                    instance = new Conexion();
+    public static Conexion getInstance() {
+            if (instance == null) {
+                synchronized (Conexion.class) {
+                    if (instance == null) {
+                        instance = new Conexion();
+                    }
                 }
             }
+            return instance;
         }
-        return instance;
-    }
 
-    // ESTE ES EL MÉTODO CLAVE: Cada llamada a getConnection() devuelve una NUEVA conexión.
+    // Método para conexiones estáticas (ej. para cargar tablas al inicio)
+    // Puedes mantenerlo si usas un usuario administrador genérico para cargar datos.
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+        // Usa las credenciales de administración si es necesario, si no, puedes eliminar este método.
+        return DriverManager.getConnection(DB_URL, "postgres", "12345678"); 
     }
 
-    // No necesitas un método closeConnection() aquí, ya que cada conexión es gestionada por el llamador.
-    // El llamador es responsable de cerrar la conexión que obtiene.
+    public Connection getConnection(String user, String password) throws SQLException {
+        return DriverManager.getConnection(DB_URL, user, password);
+    }
 }

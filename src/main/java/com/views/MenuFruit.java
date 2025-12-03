@@ -1,8 +1,12 @@
 package com.views;
 
-import com.model.Usuario;
+import com.conexion.Conexion;
 import java.awt.Color;
 import java.awt.Image;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -12,20 +16,24 @@ import javax.swing.JOptionPane;
 public class MenuFruit extends javax.swing.JFrame {
     
     private java.awt.CardLayout cardLayout;
-    private Usuario usuarioActual;
+    private String nombreUsuario;
+    private String rolFuncional;
 
-    public MenuFruit(Usuario user) {
-        this.usuarioActual = user;
+    public MenuFruit(String usuarioLogin) {
+        String grupoFuncional = obtenerGrupoFuncional(usuarioLogin);
+        this.nombreUsuario = usuarioLogin;    // Guarda "usuario"
+        this.rolFuncional = grupoFuncional;  // Guarda "login"
+        
         initComponents();
         
         SetImageLabel(logo,"src/main/resources/images/logo.jpg");
-        textwelcome.setText("Bienvenido, " + user.getNombreEmpleado()); 
-        
+        textwelcome.setText("Bienvenido, " + this.nombreUsuario);
+        rol.setText("" + grupoFuncional);
         configurarPermisos();
       
         cardLayout = (java.awt.CardLayout) panelcontenedor.getLayout();
-        PuntoVenta pnlVentas = new PuntoVenta(usuarioActual); 
-        InventarioProducto pnlProducto = new InventarioProducto(usuarioActual);
+        PuntoVenta pnlVentas = new PuntoVenta(); 
+        InventarioProducto pnlProducto = new InventarioProducto();
         panelcontenedor.add(pnlVentas, "Ventas");
         panelcontenedor.add(pnlProducto, "Producto");
     }
@@ -37,8 +45,50 @@ public class MenuFruit extends javax.swing.JFrame {
         this.repaint();
     }
     
+    private String obtenerGrupoFuncional(String usuario) {
+        // Definimos los grupos (roles) que vamos a verificar en PostgreSQL
+        String[] grupos = {"administrador_sistema", "supervisor", "vendedor"}; 
+
+        // Consulta SQL para verificar si el usuario es miembro de un rol
+        String sql = "SELECT 1 FROM pg_auth_members m JOIN pg_roles g ON m.roleid = g.oid "
+                   + "JOIN pg_roles u ON m.member = u.oid "
+                   + "WHERE u.rolname = ? AND g.rolname = ?";
+
+        //Todo el try/catch debe centrarse en la conexión de Administrador
+        try (Connection adminConn = Conexion.getInstance().getConnection()) {
+
+            try (PreparedStatement ps = adminConn.prepareStatement(sql)) {
+
+                for (String grupo : grupos) {
+                    ps.setString(1, usuario); // Usuario que inició sesión
+                    ps.setString(2, grupo);   // Rol de grupo a verificar (administrador_sistema, supervisor, etc.)
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            // Se encontró el grupo, retornamos el nombre simplificado para el switch.
+                            if (grupo.equals("administrador_sistema")) {
+                                return "Administrador";
+                            } else if (grupo.equals("supervisor")) {
+                                return "Supervisor";
+                            } else if (grupo.equals("vendedor")) { // Tu rol de grupo "vendedor"
+                                return "Vendedor";
+                            }
+                        }
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            // Solo capturará errores de la consulta misma (no de autenticación)
+            System.err.println("Error al obtener grupos funcionales para " + usuario + ": " + e.getMessage());
+            return "Default"; 
+        }
+    
+        return "Default"; 
+    }
+    
     private void configurarPermisos() {
-        String rol = usuarioActual.getNombreRol();
+        String rol = this.rolFuncional;
 
         puntoventatext.setVisible(false);
         productotext.setVisible(false);
@@ -46,9 +96,6 @@ public class MenuFruit extends javax.swing.JFrame {
         clientestext.setVisible(false);
         reportexx.setVisible(false);
         empleadotext.setVisible(false);
-
-        // Los botones 'button1' (Punto de Venta) y 'button2' (Producto)
-        // los tratamos con el switch.
 
         switch (rol) {
             case "Administrador":
@@ -60,20 +107,7 @@ public class MenuFruit extends javax.swing.JFrame {
                 empleadotext.setVisible(true);
                 break;
 
-            case "Vendedor":
-                // El vendedor solo necesita vender y ver clientes
-                puntoventatext.setVisible(true);
-                clientestext.setVisible(true);
-                break;
-
-            case "Almacen":
-                // El personal de almacén solo gestiona inventario y compras
-                productotext.setVisible(true); // Producto/Inventario
-                comprastext.setVisible(true); // Compras
-                break;
-
             case "Supervisor":
-                // El supervisor ve casi todo excepto gestión de empleados
                 puntoventatext.setVisible(true);
                 productotext.setVisible(true);
                 comprastext.setVisible(true);
@@ -116,6 +150,7 @@ public class MenuFruit extends javax.swing.JFrame {
         button6 = new javax.swing.JPanel();
         empleadotext = new javax.swing.JLabel();
         panelcontenedor = new javax.swing.JPanel();
+        rol = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -377,6 +412,9 @@ public class MenuFruit extends javax.swing.JFrame {
         panelcontenedor.setLayout(new java.awt.CardLayout());
         gb.add(panelcontenedor, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 70, 510, 360));
 
+        rol.setToolTipText("");
+        gb.add(rol, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 430, 100, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -527,6 +565,7 @@ public class MenuFruit extends javax.swing.JFrame {
     private javax.swing.JLabel productotext;
     private javax.swing.JLabel puntoventatext;
     private javax.swing.JLabel reportexx;
+    private javax.swing.JLabel rol;
     private javax.swing.JLabel textwelcome;
     // End of variables declaration//GEN-END:variables
 }

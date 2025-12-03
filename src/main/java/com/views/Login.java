@@ -1,12 +1,13 @@
 package com.views;
 
-import com.DAO.UsuarioDAO;
+import com.conexion.Conexion;
 import java.awt.Image;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import com.model.Usuario;
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
 
@@ -141,23 +142,33 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void loginbuttonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loginbuttonMouseClicked
-        String usuarioIngresado = usertext.getText(); 
+        String usuarioIngresado = usertext.getText();
         String passwordIngresada = new String(txtPassword.getPassword());
 
-        UsuarioDAO uDAO = new UsuarioDAO();
+        Connection tempConn = null;
+    
+        try {
+        // INTENTAR LA CONEXIÓN CON LAS CREDENCIALES DEL USUARIO
+        // Si PostgreSQL acepta la conexión, el usuario existe y la contraseña es correcta.
+        tempConn = Conexion.getInstance().getConnection(usuarioIngresado, passwordIngresada);
         
-        Usuario usuarioAutenticado = uDAO.autenticarUsuario(usuarioIngresado, passwordIngresada);
+        JOptionPane.showMessageDialog(this, "Bienvenido, " + usuarioIngresado);
+        
+        MenuFruit menu = new MenuFruit(usuarioIngresado); 
+        menu.setVisible(true);
+        this.dispose();
 
-        if (usuarioAutenticado != null) {
-            JOptionPane.showMessageDialog(this, "Bienvenido, " + usuarioAutenticado.getNombreEmpleado() + 
-                                                " (" + usuarioAutenticado.getNombreRol() + ")");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos. (Error: " + e.getMessage() + ")", "Error de Login", JOptionPane.ERROR_MESSAGE);
 
-            MenuFruit menu = new MenuFruit(usuarioAutenticado); 
-            menu.setVisible(true);
-            this.dispose(); 
-
-        } else {
-            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.", "Error de Login", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            if (tempConn != null) {
+                try {
+                    tempConn.close();
+                } catch (SQLException e) {
+                    System.err.println("Error al cerrar la conexión de login: " + e.getMessage());
+                }
+            }
         }
     }//GEN-LAST:event_loginbuttonMouseClicked
 
@@ -170,7 +181,7 @@ public class Login extends javax.swing.JFrame {
         txtPassword.setForeground(Color.BLACK);
         txtPassword.setText("");
     }//GEN-LAST:event_txtPasswordMouseClicked
-    
+
     
     /**
      * @param args the command line arguments

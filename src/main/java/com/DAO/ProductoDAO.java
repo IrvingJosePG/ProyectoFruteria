@@ -58,14 +58,85 @@ public class ProductoDAO {
                 p.setUnidad_medida(rs.getString("unidad_medida"));
                 p.setExitencia(rs.getInt("existencia"));
                 p.setPrecio_c(rs.getDouble("precio_c"));
-                p.setPrecio_c(rs.getDouble("precio_v"));
+                p.setPrecio_v(rs.getDouble("precio_v"));
                 productos.add(p);
             }
         }
         return productos;
     }
     
+    // Archivo: ProductoDAO.java
+
+    public int guardarProducto(Producto p) throws SQLException {
+        String sql = "INSERT INTO fruteria.producto (descripcion, categoria, unidad_medida, existencia, precio_c, precio_v) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = Conexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, p.getDescripcion());
+            ps.setString(2, p.getCategoria());
+            ps.setString(3, p.getUnidad_medida());
+            ps.setInt(4, p.getExitencia());
+            ps.setDouble(5, p.getPrecio_c());
+            ps.setDouble(6, p.getPrecio_v());
+
+            int filasAfectadas = ps.executeUpdate();
+
+            if (filasAfectadas > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1); // Devuelve el código generado
+                    }
+                }
+            }
+            return -1; // Devuelve -1 si falla
+
+        } catch (SQLException e) {
+            throw e;
+        }
+    }
     
+    public boolean actualizarAtributosProducto(Producto p) throws SQLException {
+        String sql = "UPDATE fruteria.producto SET descripcion=?, categoria=?, unidad_medida=?, precio_c=?, precio_v=? WHERE codigo=?";
+
+        try (Connection conn = Conexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, p.getDescripcion());
+            ps.setString(2, p.getCategoria());
+            ps.setString(3, p.getUnidad_medida());
+            // NO incluimos 'existencia' (stock)
+            ps.setDouble(4, p.getPrecio_c());
+            ps.setDouble(5, p.getPrecio_v());
+
+            // La condición WHERE
+            ps.setInt(6, p.getCodigo()); 
+
+            int filasAfectadas = ps.executeUpdate();
+            return filasAfectadas > 0;
+
+        } catch (SQLException e) {
+            throw e;
+        }
+    }
+    
+    
+    public boolean eliminarProducto(int codigo) throws SQLException {
+        // La eliminación aquí dispara el TRIGGER de Auditoría
+        String sql = "DELETE FROM fruteria.producto WHERE codigo = ?";
+
+        try (Connection conn = Conexion.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, codigo);
+
+            int filasAfectadas = ps.executeUpdate();
+            return filasAfectadas > 0;
+
+        } catch (SQLException e) {
+            throw e;
+        }
+    }
     // (Aquí irán otros métodos como insertar, actualizar, listar, etc.)
     
     

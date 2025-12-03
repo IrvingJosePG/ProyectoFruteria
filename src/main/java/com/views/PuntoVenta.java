@@ -1,12 +1,13 @@
 package com.views;
 
 import com.DAO.ClienteDAO;
+import com.DAO.EmpleadoDAO;
 import com.DAO.ProductoDAO;
 import com.DAO.VentaDAO;
 import com.model.Cliente;
 import com.model.DetalleVentaTemporal;
+import com.model.Empleado;
 import com.model.Producto;
-import com.model.Usuario;
 import com.model.Venta;
 import java.awt.List;
 import java.time.LocalDate;
@@ -17,15 +18,13 @@ import javax.swing.table.DefaultTableModel;
 
 public class PuntoVenta extends javax.swing.JPanel {
 
-    private Usuario usuarioActual;
     private Producto productoActual;
     private DefaultTableModel modeloCarrito; 
     private double totalVentaAcumulado = 0.0; 
     private java.util.List<DetalleVentaTemporal> detallesVenta;
     private javax.swing.JComboBox<com.model.Cliente> clienteregistrados;
     
-    public PuntoVenta(Usuario user) {
-        this.usuarioActual = user;
+    public PuntoVenta() {
         initComponents();
         casillavendido.setEnabled(false);
         
@@ -34,6 +33,7 @@ public class PuntoVenta extends javax.swing.JPanel {
         
         modeloCarrito.setColumnIdentifiers(new Object[]{"Producto", "Cantidad", "Precio Unitario", "Subtotal"});
         cargarClientes();
+        cargarEmpleados();
     }
 
     private void buscarProducto() {
@@ -177,6 +177,25 @@ public class PuntoVenta extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(this, "Error al cargar la lista de clientes: " + e.getMessage(), "Error de Carga", JOptionPane.ERROR_MESSAGE);
         }
     }  
+    
+    private void cargarEmpleados(){
+        try {
+            EmpleadoDAO dao = new EmpleadoDAO();
+            java.util.List<Empleado> empleados = dao.listarEmpleados();
+
+            empleadosregistrados.removeAllItems(); 
+            
+            Empleado EmpleadoDefault = new Empleado(0, "Cargar Empleado ", " " , 0);
+            empleadosregistrados.addItem(EmpleadoDefault);
+            
+            for (Empleado empleado : empleados) {
+                empleadosregistrados.addItem(empleado);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar la lista de empleados: " + e.getMessage(), "Error de Carga", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -214,6 +233,8 @@ public class PuntoVenta extends javax.swing.JPanel {
         txtpreciocompra = new javax.swing.JLabel();
         productoprecioc = new javax.swing.JLabel();
         clienteregistrados1 = new javax.swing.JComboBox<>();
+        txtempleado = new javax.swing.JLabel();
+        empleadosregistrados = new javax.swing.JComboBox<>();
 
         setBackground(new java.awt.Color(252, 249, 235));
         setPreferredSize(new java.awt.Dimension(300, 300));
@@ -389,6 +410,11 @@ public class PuntoVenta extends javax.swing.JPanel {
         add(productoprecioc, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 150, -1, -1));
 
         add(clienteregistrados1, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 300, 250, 20));
+
+        txtempleado.setText("Empleado:");
+        add(txtempleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 330, -1, 20));
+
+        add(empleadosregistrados, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 330, 220, 20));
     }// </editor-fold>//GEN-END:initComponents
 
     private void buscarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buscarMouseClicked
@@ -431,13 +457,19 @@ public class PuntoVenta extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(this, "Debe seleccionar un cliente válido.", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        
+        Empleado EmpleadoSeleccionado = (Empleado) empleadosregistrados.getSelectedItem();
+        if (EmpleadoSeleccionado == null || EmpleadoSeleccionado.getId_e() == 0) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un empleado para la venta.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
         // 2. Crear Objeto Venta (Encabezado)
         Venta venta = new Venta();
         venta.setFecha(LocalDate.now()); 
         venta.setIdCliente(clienteSeleccionado.getId_c());
         // **CRÍTICO**: Asumimos que tienes una variable 'usuarioActual' con el empleado logueado
-        venta.setIdEmpleado(usuarioActual.getIdEmpleado()); 
+        venta.setIdEmpleado(EmpleadoSeleccionado.getId_e()); 
 
         // 3. Ejecutar Transacción
         VentaDAO dao = new VentaDAO();
@@ -476,6 +508,7 @@ public class PuntoVenta extends javax.swing.JPanel {
     private javax.swing.JCheckBox casillavendido;
     private javax.swing.JLabel categoriaproducto;
     private javax.swing.JComboBox<com.model.Cliente> clienteregistrados1;
+    private javax.swing.JComboBox<com.model.Empleado> empleadosregistrados;
     private javax.swing.JLabel finalizarventa;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel nombreproducto;
@@ -491,6 +524,7 @@ public class PuntoVenta extends javax.swing.JPanel {
     private javax.swing.JLabel txtcantidad;
     private javax.swing.JLabel txtcategoria;
     private javax.swing.JLabel txtcliente;
+    private javax.swing.JLabel txtempleado;
     private javax.swing.JLabel txtnombre;
     private javax.swing.JLabel txtpreciocompra;
     private javax.swing.JLabel txtprecioventa;
