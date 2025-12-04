@@ -610,7 +610,7 @@ BEGIN
     -- Verificar existencia antes de la venta
     -- Bloquear y obtener la existencia actual. El FOR UPDATE previene 
     -- que otras transacciones modifiquen la existencia hasta que esta termine.
-    SELECT existencia INTO v_existencia_actual FROM fruteria.producto WHERE codigo = p_codigo FOR UPDATE;;
+    SELECT existencia INTO v_existencia_actual FROM fruteria.producto WHERE codigo = p_codigo FOR UPDATE;
  
     -- Verificar que el producto existe y que la cantidad solicitada no supera el stock.
     IF v_existencia_actual IS NULL THEN
