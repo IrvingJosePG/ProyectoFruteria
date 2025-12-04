@@ -596,6 +596,7 @@ ALTER COLUMN folio_c SET DEFAULT nextval('fruteria.folio_compra_seq');
 -------------------------------------------------------------
 
 -- FUNCIÓN 1: registra un producto en detalle_venta y descuenta su existencia.
+-- Utiliza la cláusula FOR UPDATE para prevenir errores de stock en entornos concurrentes.
 CREATE OR REPLACE FUNCTION fruteria.registrar_detalle_y_stock(
     p_folio_v INTEGER,
     p_codigo INTEGER,
@@ -607,12 +608,16 @@ DECLARE
     v_existencia_actual INTEGER;
 BEGIN
     -- Verificar existencia antes de la venta
-    SELECT existencia INTO v_existencia_actual FROM fruteria.producto WHERE codigo = p_codigo;
-
+    -- Bloquear y obtener la existencia actual. El FOR UPDATE previene 
+    -- que otras transacciones modifiquen la existencia hasta que esta termine.
+    SELECT existencia INTO v_existencia_actual FROM fruteria.producto WHERE codigo = p_codigo FOR UPDATE;;
+ 
+    -- Verificar que el producto existe y que la cantidad solicitada no supera el stock.
     IF v_existencia_actual IS NULL THEN
         RAISE EXCEPTION 'Error: El producto con código % no existe.', p_codigo;
     ELSIF v_existencia_actual < p_cantidad THEN
-        RAISE EXCEPTION 'Error de Stock: Solo quedan % unidades del producto %.', v_existencia_actual, p_codigo;
+        RAISE EXCEPTION 'Error de Stock: Solo quedan % unidades del producto % (se solicitó %).', 
+            v_existencia_actual, p_codigo, p_cantidad;
     END IF;
 
     -- 1. INSERTAR en la tabla detalle_venta
