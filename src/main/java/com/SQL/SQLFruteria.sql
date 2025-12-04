@@ -316,7 +316,7 @@ INSERT INTO empleado (id_e, nombre, turno, salario) VALUES
 (7039,'Tania Solís','matutino',3750), (7040,'Uriel Ramos','vespertino',5100), (7041,'Valeria Luna','matutino',4750),
 (7042,'Xavier Robles','vespertino',4050), (7043,'Yolanda Pardo','matutino',4600), (7044,'Zoe Vidal','vespertino',4800),
 (7045,'Alan Guerrero','matutino',3550), (7046,'Beto Flores','vespertino',5200), (7047,'Ceci López','matutino',4300),
-(7048,'David Pérez','vespertino',3850), (7049,'Eva Torres','matutino',4950);
+(7048,'David Pérez','vespertino',3850), (7049,'Eva Torres','matutino',4950), (7050,'Irving Perez','matutino',4650);
 
 SELECT setval('fruteria.empleado_id_e_seq', (SELECT MAX(id_e) FROM fruteria.empleado), true);
 
@@ -332,7 +332,7 @@ INSERT INTO supervisor VALUES
 (7031, 7000), (7032, 7020), (7033, 7000), (7034, 7020), (7035, 7000),
 (7036, 7020), (7037, 7000), (7038, 7020), (7039, 7000), (7040, 7020),
 (7041, 7000), (7042, 7020), (7043, 7000), (7044, 7020), (7045, 7000),
-(7046, 7020), (7047, 7000), (7048, 7020), (7049, 7000), (7049, 7020); -- Se repite 7049 con dos supervisores para llegar a 50 filas
+(7046, 7020), (7047, 7000), (7048, 7020), (7049, 7000), (7050, 7020); 
 
 -- Ventas (50 datos)
 INSERT INTO venta VALUES 
