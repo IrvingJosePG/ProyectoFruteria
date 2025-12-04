@@ -496,6 +496,8 @@ public class PuntoVenta extends javax.swing.JPanel {
     
     totalventa.setText("0.00"); 
     clienteregistrados1.setSelectedIndex(0); 
+    empleadosregistrados.setSelectedIndex(0);
+    cantidadvendida.setValue(0);
 }
     
 

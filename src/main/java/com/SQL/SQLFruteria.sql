@@ -1,5 +1,5 @@
 -- ####################################################################
--- # SCRIPT FINAL CONSOLIDADO (DDL, DML, Funciones, Triggers)
+-- # SCRIPT FRUTERIA
 -- ####################################################################
 
 -- Database: proyectobd_fruteria
@@ -54,15 +54,17 @@ CREATE TABLE cliente(
     domicilio VARCHAR(50)
 );
 
+-- Cliente de Tipo Persona Moral
 CREATE TABLE p_moral(
     id_c INTEGER PRIMARY KEY,
     razon_social VARCHAR(50) NOT NULL,
     FOREIGN KEY (id_c) REFERENCES cliente(id_c)
 );
 
+-- Cliente de Tipo Persona Física
 CREATE TABLE p_fisica(
     id_c INTEGER PRIMARY KEY,
-    nombre VARCHAR(25) NOT NULL,
+    nombre VARCHAR(50) NOT NULL, -- Se amplió a 50 para nombres completos
     FOREIGN KEY (id_c) REFERENCES cliente(id_c)
 );
 
@@ -123,13 +125,11 @@ CREATE TABLE auditoria (
 );
 
 
--- 4. INSERCIÓN DE DATOS DE PRUEBA (DML - Mínimo 50 datos por tabla según tu requerimiento)
+-- 4. INSERCIÓN DE DATOS DE PRUEBA (DML - 50+ datos por tabla)
 -------------------------------------------------------------
--- NOTA: Se ha modificado para que 'producto', 'proveedor', 'cliente' y 'empleado' usen SERIAL
--- y para que los INSERTs no especifiquen el ID, sino que PostgreSQL lo genere automáticamente.
+-- Se mantiene el uso de setval() para continuar la numeración secuencial.
 
--- Productos (Añadidos más datos para cumplir con el requisito de 50 en todas las tablas)
--- Se usa la función setval() al final para simular los IDs que usas en el resto de la DML
+-- Productos (51 datos)
 INSERT INTO producto (codigo, descripcion, categoria, unidad_medida, existencia, precio_c, precio_v) VALUES 
 (5000, 'manzana roja','fruta','kilogramo', 15, 40.50, 65),
 (5001, 'manzana verde','fruta','kilogramo', 8, 50, 60),
@@ -182,7 +182,7 @@ INSERT INTO producto (codigo, descripcion, categoria, unidad_medida, existencia,
 (5049, 'chile de árbol','verdura','gramo', 5, 80, 120),
 (5050, 'chile guajillo','verdura','gramo', 8, 70, 100);
 
--- Proveedores (50 datos)
+-- Proveedores (51 datos)
 INSERT INTO proveedor (id_p, nombre, ciudad, contacto, tel_contacto) VALUES 
 (2000, 'la manzanita', 'oaxaca','sr. carlos pérez','9512356789'),
 (2001, 'la poblanita', 'puebla','sra. guadalupe hernández','2221357698'),
@@ -242,7 +242,7 @@ SELECT setval('fruteria.producto_codigo_seq', (SELECT MAX(codigo) FROM fruteria.
 SELECT setval('fruteria.proveedor_id_p_seq', (SELECT MAX(id_p) FROM fruteria.proveedor), true);
 
 
--- Producto_Proveedor (Al menos 50 datos)
+-- Producto_Proveedor (50 datos)
 INSERT INTO producto_proveedor VALUES 
 (5000, 2008), (5012, 2019), (5024, 2013), (5016, 2006), (5015, 2006),
 (5008, 2015), (5009, 2015), (5001, 2003), (5007, 2003), (5009, 2005),
@@ -257,8 +257,9 @@ INSERT INTO producto_proveedor VALUES
 (5045, 2041), (5046, 2042), (5047, 2043), (5048, 2044), (5049, 2045);
 
 
--- Clientes (50 datos)
+-- Clientes (100 datos totales) - CORREGIDO
 INSERT INTO cliente (id_c, telefono, rfc, domicilio) VALUES 
+-- Clientes 3000 - 3049 (Usados para Persona Moral)
 (3000,'9713234566', 'ABCD123456', 'juárez 505'), (3001,'9512067788', 'EFGH789123', 'morelos 1205'),(3002,'9562899901', 'AIJK345678', 'independencia 2202'),
 (3003,'9716234533', 'MABC123456', 'matamoros 345'), (3004,'9518231133', 'KLGH789123', 'lindavista 235'),(3005,'9563214422', 'WZKT345678', 'iturbide 2202'),
 (3006,'9713234567', 'ABCD123457', 'juárez 505'), (3007,'9518065511', 'AMLN889123', 'pico de orizaba 333'),(3008,'9571459901', 'OPQR235678', 'anillo periférico 15'),
@@ -266,7 +267,6 @@ INSERT INTO cliente (id_c, telefono, rfc, domicilio) VALUES
 (3012,'9786745321', 'PABC901203', 'justo sierra 1111'), (3013,'9516452300', 'MARZ130921', 'cayetano 23'),(3014,'9589128801', 'XJYT150623', 'guadalupe hinojosa 2300'),
 (3015,'9717234866', 'RTUO170312', 'periférico 5671'), (3016,'9585691277', 'HAIO141120', 'alfiles 285'),(3017,'9514866901', 'ZDOP130630', 'armonía 1302'),
 (3018,'9511230907', 'CUBO100418', 'regueira 3456'), (3019,'9566231222', 'GPLM110918', 'faisanes 23'),(3020,'9511599871', 'LEWI170211', 'brasil 803'),
--- Nuevos clientes para llegar a 50
 (3021,'9713234588', 'WERT101010', 'Calle A 1'), (3022,'9512067799', 'ASDF202020', 'Calle B 2'), (3023,'9562899911', 'ZXCV303030', 'Calle C 3'),
 (3024,'9716234544', 'QWER404040', 'Calle D 4'), (3025,'9518231144', 'TYUI505050', 'Calle E 5'), (3026,'9563214433', 'PLOK606060', 'Calle F 6'),
 (3027,'9713234599', 'MJNB707070', 'Calle G 7'), (3028,'9518065522', 'YHGT808080', 'Calle H 8'), (3029,'9571459911', 'RFDE909090', 'Calle I 9'),
@@ -276,28 +276,161 @@ INSERT INTO cliente (id_c, telefono, rfc, domicilio) VALUES
 (3039,'9511230911', 'ZAQW901234', 'Calle S 19'), (3040,'9566231233', 'SDFG567890', 'Calle T 20'), (3041,'9511599888', 'HJKL123456', 'Calle U 21'),
 (3042,'9713234500', 'ZXCV789012', 'Calle V 22'), (3043,'9512067701', 'BNMM345678', 'Calle W 23'), (3044,'9562899902', 'ASDQ901234', 'Calle X 24'),
 (3045,'9716234503', 'FGHJ567890', 'Calle Y 25'), (3046,'9518231104', 'QWER123456', 'Calle Z 26'), (3047,'9563214405', 'TYUI789012', 'Calle AA 27'),
-(3048,'9713234506', 'PLOK345678', 'Calle BB 28'), (3049,'9518065507', 'MJNB901234', 'Calle CC 29');
+(3048,'9713234506', 'PLOK345678', 'Calle BB 28'), (3049,'9518065507', 'MJNB901234', 'Calle CC 29'),
+-- Clientes 3050 - 3099 (Usados para Persona Física) - Añadidos para completar los 100 clientes
+(3050,'9711001100', 'PRRA800101XYZ', 'Calle 1 de Mayo 10'),
+(3051,'9512002200', 'MMCS800202ABC', 'Av. Juárez 20'),
+(3052,'9563003300', 'RMSM800303DEF', 'Independencia 30'),
+(3053,'9714004400', 'BRGG800404GHI', 'Matamoros 40'),
+(3054,'9515005500', 'ASLL800505JKL', 'Lindavista 50'),
+(3055,'9566006600', 'CMPP800606MNO', 'Iturbide 60'),
+(3056,'9717007700', 'MLHH800707PQR', 'Calle G 70'),
+(3057,'9518008800', 'AHHS800808STU', 'Pico de Orizaba 80'),
+(3058,'9579009900', 'RVCC800909VWX', 'Anillo Periférico 90'),
+(3059,'9511010101', 'GSRR801010YZA', 'Emiliano Zapata 100'),
+(3060,'9512020202', 'SRTT801111BCD', 'Emilio Carranza 110'),
+(3061,'9513030303', 'JNMM801212EFG', 'Río de la Plata 120'),
+(3062,'9784040404', 'BSDD801313HIJ', 'Justo Sierra 130'),
+(3063,'9515050505', 'MÁRV801414KLM', 'Cayetano 140'),
+(3064,'9586060606', 'LGPP801515NOP', 'Guadalupe Hinojosa 150'),
+(3065,'9717070707', 'RHRR801616QRS', 'Periférico 160'),
+(3066,'9588080808', 'SJLL801717TUV', 'Alfiles 170'),
+(3067,'9519090909', 'EVTT801818WXY', 'Armonía 180'),
+(3068,'9511111111', 'XFSS801919ZAB', 'Regueira 190'),
+(3069,'9562222222', 'DARJ802020CDE', 'Faisanes 200'),
+(3070,'9513333333', 'IABP802121FGH', 'Brasil 210'),
+(3071,'9714444444', 'CDGG802222IJK', 'Calle A 220'),
+(3072,'9515555555', 'EMRR802323LMN', 'Calle B 230'),
+(3073,'9566666666', 'FGIO802424OPQ', 'Calle C 240'),
+(3074,'9717777777', 'GPNÑ802525RST', 'Calle D 250'),
+(3075,'9518888888', 'HQPP802626UVW', 'Calle E 260'),
+(3076,'9579999999', 'ISTS802727XYZ', 'Calle F 270'),
+(3077,'9511212121', 'JTVV802828ZAA', 'Calle G 280'),
+(3078,'9513434343', 'KUZZ802929ABB', 'Calle H 290'),
+(3079,'9785656565', 'LVCC803030ACC', 'Calle I 300'),
+(3080,'9517878787', 'MWEE803131ADD', 'Calle J 310'),
+(3081,'9589090909', 'NYFF803232AEE', 'Calle K 320'),
+(3082,'9711313131', 'OZZL803333AFF', 'Calle L 330'),
+(3083,'9582424242', 'PAMM803434AGG', 'Calle M 340'),
+(3084,'9513535353', 'QBSS803535AHH', 'Calle N 350'),
+(3085,'9564646464', 'RCDD803636AII', 'Calle O 360'),
+(3086,'9715757575', 'SDGG803737AJJ', 'Calle P 370'),
+(3087,'9516868686', 'TELE803838AKK', 'Calle Q 380'),
+(3088,'9577979797', 'UFNÑ803939ALL', 'Calle R 390'),
+(3089,'9518080808', 'VGGR804040AMM', 'Calle S 400'),
+(3090,'9519191919', 'WHII804141ANN', 'Calle T 410'),
+(3091,'9781010101', 'YIJG804242AOO', 'Calle U 420'),
+(3092,'9512323232', 'ZJKK804343APP', 'Calle V 430'),
+(3093,'9584545454', 'ALMM804444AQQ', 'Calle W 440'),
+(3094,'9716767676', 'BNNO804545ARR', 'Calle X 450'),
+(3095,'9587878787', 'CQPP804646ASS', 'Calle Y 460'),
+(3096,'9518989898', 'DRSS804747ATT', 'Calle Z 470'),
+(3097,'9561212121', 'ESTT804848AUU', 'Calle AA 480'),
+(3098,'9713434343', 'FUVI804949AVV', 'Calle BB 490'),
+(3099,'9515656565', 'GZAA805050AWW', 'Calle CC 500');
 
 SELECT setval('fruteria.cliente_id_c_seq', (SELECT MAX(id_c) FROM fruteria.cliente), true);
+        
+-- Clientes Persona Moral (50 datos) - IDs 3000 a 3049
+INSERT INTO fruteria.p_moral (id_c, razon_social) VALUES 
+(3000,'La Espiga de Oro S.A.'), (3001,'La Calabaza Feliz S.C.'),  (3002, 'Grupo Frutero del Bajío'), (3003, 'Viandas del Centro Mayorista'), (3004,'Frutas y Verduras del Sur S.P.R.'), 
+(3005,'Grupo Surtidores del Norte'), (3006,'La Pera Verde Distribuciones'), (3007,'La Central de Verduras Frescas'),  (3008,'Frutas La Poblana Express'),
+(3009,'El Mercadito de Don Pepe'), (3010, 'Fruteria La Tortuga Veloz'),  (3011, 'Alimentos Selectos Gourmet'),
+(3012, 'Comercializadora El Manzano'),
+(3013, 'Proveedora Agrícola Integral'),
+(3014, 'Vegetales de la Huerta S.A.'),
+(3015, 'Distribuidora Fénix Fresco'),
+(3016, 'Insumos Culinarios MX'),
+(3017, 'Mercado de Abastos Digital'),
+(3018, 'Cadena de Tiendas El Limón'),
+(3019, 'Suministros del Campo Verde'),
+(3020, 'Logística Frutal Rápida'),
+(3021, 'Bodega de Semillas y Granos'),
+(3022, 'El Rincón del Aguacate S.C.'),
+(3023, 'Fondo de Abarrotes y Víveres'),
+(3024, 'Organización Cosecha Segura'),
+(3025, 'Empresarial de Alimentos Puros'),
+(3026, 'Conexión Hortícola Azteca'),
+(3027, 'Mayoristas del Trópico'),
+(3028, 'Frutales de Exportación Global'),
+(3029, 'La Naranja Mecánica S.A.'),
+(3030, 'El Plátano Festivo'),
+(3031, 'Productora de Jugos Naturales'),
+(3032, 'Supermercado La Canasta'),
+(3033, 'Servicios de Catering Frescura'),
+(3034, 'El Granero de Mamá Lucha'),
+(3035, 'Agropecuaria Tierra Fértil'),
+(3036, 'Distribución de Productos Orgánicos'),
+(3037, 'La Tienda de la Esquina S.A.'),
+(3038, 'Abarrotes Don Chuy'),
+(3039, 'Central de Carnes y Frutas'),
+(3040, 'Mi Rancho Chico S.P.R.'),
+(3041, 'Frutiverduras La Palma'),
+(3042, 'Empacadora El Durazno'),
+(3043, 'Mayorista El Camión'),
+(3044, 'Hortifrutícola del Mar'),
+(3045, 'El Huerto Secreto'),
+(3046, 'Cooperativa La Milpa'),
+(3047, 'Comercio Exterior de Alimentos'),
+(3048, 'Tienda de Conveniencia 24/7'),
+(3049, 'Distribuidora de Hortalizas Finas');
 
--- Clientes Persona Moral (25 datos)
-INSERT INTO p_moral VALUES 
-(3000,'la espiga'), (3001,'la calabaza'), (3002, 'grupo frutero'), (3003, 'viandas del centro'),(3004,'frutas del sur'), 
-(3005,'grupo surtidores del norte'), (3006,'la pera vered'),(3007,'la central de verduras'), (3008,'frutas la poblana'), 
-(3009,'el mercadito'), (3010, 'futeria la tortuga'), (3021, 'Moral 1'), (3022, 'Moral 2'), (3023, 'Moral 3'), (3024, 'Moral 4'), 
-(3025, 'Moral 5'), (3026, 'Moral 6'), (3027, 'Moral 7'), (3028, 'Moral 8'), (3029, 'Moral 9'), 
-(3030, 'Moral 10'), (3031, 'Moral 11'), (3032, 'Moral 12'), (3033, 'Moral 13'), (3034, 'Moral 14');
-		
--- Clientes Persona Física (25 datos)
-INSERT INTO p_fisica VALUES 
-(3011,'armando pérez'), (3012,'margarita martínez'),(3013,'rogelio medina'), (3014, 'braulio robles'), (3015, 'andrés suarez'),
-(3016,'celia mayoral'), (3017,'mauricio lugo'), (3018,'adriana herrera'), (3019,'roberto valladares'), (3020, 'guadalupe santibañez'),
-(3035,'Física 1'), (3036,'Física 2'), (3037,'Física 3'), (3038,'Física 4'), (3039,'Física 5'), 
-(3040,'Física 6'), (3041,'Física 7'), (3042,'Física 8'), (3043,'Física 9'), (3044,'Física 10'),
-(3045,'Física 11'), (3046,'Física 12'), (3047,'Física 13'), (3048,'Física 14'), (3049,'Física 15');
+
+-- Clientes Persona Física (50 datos) - IDs 3050 a 3099
+INSERT INTO fruteria.p_fisica (id_c, nombre) VALUES 
+(3050,'Armando Pérez Rocha'), 
+(3051,'Margarita Martínez Castro'),
+(3052,'Rogelio Medina Soto'), 
+(3053, 'Braulio Robles Guzmán'), 
+(3054, 'Andrés Suárez López'),
+(3055,'Celia Mayoral Pineda'), 
+(3056,'Mauricio Lugo Herrera'), 
+(3057,'Adriana Herrera Salas'), 
+(3058,'Roberto Valladares Cruz'), 
+(3059, 'Guadalupe Santibañez Rico'),
+(3060,'Silvia Ramírez Torres'), 
+(3061,'Javier Nájera Mora'), 
+(3062,'Brenda Solís Díaz'), 
+(3063,'Miguel Ángel Ruíz Vega'), 
+(3064,'Laura García Pérez'),
+(3065,'Ricardo Hernández Ríos'), 
+(3066,'Sofía Jiménez Luna'), 
+(3067,'Emilio Vargas Trejo'), 
+(3068,'Ximena Flores Soto'), 
+(3069,'Diego Alonso Reyes'),
+(3070,'Ana Isabel Bravo Pérez'), 
+(3071,'Carlos Dávila Guzmán'), 
+(3072,'Elena Mendoza Rivas'), 
+(3073,'Fernando Gil Olvera'), 
+(3074,'Gloria Peña Núñez'),
+(3075,'Héctor Quiróz Ponce'), 
+(3076,'Irma Salgado Torres'), 
+(3077,'Jorge Téllez Vera'), 
+(3078,'Karla Uribe Zúñiga'), 
+(3079,'Luis Valdés Castillo'),
+(3080,'Mónica Wong Estrada'), 
+(3081,'Noé Yáñez Fuentes'), 
+(3082,'Óscar Zárate Leal'), 
+(3083,'Patricia Acosta Mora'), 
+(3084,'Quetzali Bravo Solís'),
+(3085,'Raúl Cortés Delgado'), 
+(3086,'Susana Durán Gómez'), 
+(3087,'Tomás Enríquez López'), 
+(3088,'Úrsula Franco Núñez'), 
+(3089,'Vicente Galván Rojas'),
+(3090,'Wendy Haro Islas'), 
+(3091,'Yolanda Ibarra Juárez'), 
+(3092,'Zacarías Jasso King'), 
+(3093,'Alma Lira Montes'), 
+(3094,'Benito Nieto Ochoa'),
+(3095,'Carmen Quiroz Palma'), 
+(3096,'David Robles Segura'), 
+(3097,'Eva Sosa Tapia'), 
+(3098,'Felipe Urbina Vidal'), 
+(3099,'Gabriela Zapata Aguirre');
 
 
--- Empleados (50 datos)
+-- Empleados (51 datos)
 INSERT INTO empleado (id_e, nombre, turno, salario) VALUES 
 (7000,'ricardo valencia','matutino',5500), (7001,'juan gonzález','matutino',5200), (7002,'susana lara','matutino',3500),	
 (7003,'maria fernández','vespertino',5500), (7004,'andrés rubio','vespertino',4300), (7005,'rosalba zárate','vespertino',3800),
@@ -320,13 +453,13 @@ INSERT INTO empleado (id_e, nombre, turno, salario) VALUES
 
 SELECT setval('fruteria.empleado_id_e_seq', (SELECT MAX(id_e) FROM fruteria.empleado), true);
 
--- Supervisor (50 datos)
+-- Supervisor (51 datos)
 INSERT INTO supervisor VALUES 
 -- Supervisa Robert de Niro (7009)
 (7000, 7009),(7001, 7009), (7002, 7009), (7003, 7009), (7004, 7009),(7005, 7009),(7006, 7009),(7007, 7009),(7008, 7009),
 -- Supervisa Manuel Gómez (7020)
 (7010, 7020),(7011, 7020), (7012, 7020), (7013, 7020), (7014, 7020),(7015, 7020),(7016, 7020),(7017, 7020),(7018, 7020),(7019, 7020),
--- Nuevos datos para llegar a 50 (Usando 7000 y 7020 como supervisores)
+-- Nuevos datos para llegar a 51 (Usando 7000 y 7020 como supervisores)
 (7021, 7000), (7022, 7020), (7023, 7000), (7024, 7020), (7025, 7000),
 (7026, 7020), (7027, 7000), (7028, 7020), (7029, 7000), (7030, 7020),
 (7031, 7000), (7032, 7020), (7033, 7000), (7034, 7020), (7035, 7000),
@@ -337,9 +470,9 @@ INSERT INTO supervisor VALUES
 -- Ventas (50 datos)
 INSERT INTO venta VALUES 
 (1,'2025-01-01',3000, 7010), (2,'2025-01-02',3001,7019),(3,'2025-01-03',3002,7000), (4,'2025-01-04',3003,7001),(5,'2025-01-05',3003,7002),
-(6,'2025-02-10',3004, 7011), (7,'2025-02-12',3005,7006),(8,'2025-02-15',3006,7007), (9,'2025-02-17',3007,7008),(10,'2025-02-20',3008,7011),
-(11,'2025-03-15',3000, 7001), (12,'2025-03-17',3013,7012),(13,'2025-03-18',3011,7002), (14,'2025-03-20',3016,7001),(15,'2025-03-25',3017,7015),
-(16,'2025-04-06',3014, 7003), (17,'2025-04-07',3012,7018),(18,'2025-04-08',3014,7011), (19,'2025-04-12',3008,7004),(20,'2025-04-15',3006,7002),
+(6,'2025-02-10',3050, 7011), (7,'2025-02-12',3051,7006),(8,'2025-02-15',3052,7007), (9,'2025-02-17',3053,7008),(10,'2025-02-20',3054,7011),
+(11,'2025-03-15',3000, 7001), (12,'2025-03-17',3055,7012),(13,'2025-03-18',3056,7002), (14,'2025-03-20',3057,7001),(15,'2025-03-25',3058,7015),
+(16,'2025-04-06',3059, 7003), (17,'2025-04-07',3060,7018),(18,'2025-04-08',3061,7011), (19,'2025-04-12',3062,7004),(20,'2025-04-15',3063,7002),
 (21,'2025-05-01',3021,7021), (22,'2025-05-02',3022,7022),(23,'2025-05-03',3023,7023), (24,'2025-05-04',3024,7024),(25,'2025-05-05',3025,7025),
 (26,'2025-05-06',3026,7026), (27,'2025-05-07',3027,7027),(28,'2025-05-08',3028,7028), (29,'2025-05-09',3029,7029),(30,'2025-05-10',3030,7030),
 (31,'2025-05-11',3031,7031), (32,'2025-05-12',3032,7032),(33,'2025-05-13',3033,7033), (34,'2025-05-14',3034,7034),(35,'2025-05-15',3035,7035),
@@ -347,7 +480,7 @@ INSERT INTO venta VALUES
 (41,'2025-05-21',3041,7041), (42,'2025-05-22',3042,7042),(43,'2025-05-23',3043,7043), (44,'2025-05-24',3044,7044),(45,'2025-05-25',3045,7045),
 (46,'2025-05-26',3046,7046), (47,'2025-05-27',3047,7047),(48,'2025-05-28',3048,7048), (49,'2025-05-29',3049,7049),(50,'2025-05-30',3000,7000);
 
--- Detalle_Venta (Más de 50 filas)
+-- Detalle_Venta (69 filas)
 INSERT INTO detalle_venta VALUES 
 (5000, 1,'',3), (5013, 1,'',2), (5008, 1,'',5),
 (5004, 2,'',1), (5011, 2,'',3), (5003, 2,'',2),
@@ -408,7 +541,7 @@ INSERT INTO compra VALUES
 (8044, 2200,'2025-05-25',2021,7042), (8045, 2300,'2025-05-26',2022,7043), (8046, 2400,'2025-05-27',2023,7044),
 (8047, 2500,'2025-05-28',2024,7045), (8048, 2600,'2025-05-29',2025,7046), (8049, 2700,'2025-05-30',2026,7047);
 
--- Detalle_Compra (Más de 50 filas)
+-- Detalle_Compra (69 filas)
 INSERT INTO detalle_compra VALUES 
 (8000, 5018,30),(8000,5017,10),(8000,5005,18),(8000,5010,20),
 (8001, 5000,20),(8001,5010,20),(8001,5008,10),(8001,5014,15),
@@ -459,10 +592,10 @@ ALTER TABLE fruteria.compra
 ALTER COLUMN folio_c SET DEFAULT nextval('fruteria.folio_compra_seq');
 
 
--- 6. CREACIÓN DE FUNCIONES (PL/pgSQL) - (Punto 5 del Criterio de Interfaz)
+-- 6. CREACIÓN DE FUNCIONES (PL/pgSQL)
 -------------------------------------------------------------
 
--- FUNCIÓN 1: registra un producto en detalle_venta y descuenta su existencia. (Ya la tenías)
+-- FUNCIÓN 1: registra un producto en detalle_venta y descuenta su existencia.
 CREATE OR REPLACE FUNCTION fruteria.registrar_detalle_y_stock(
     p_folio_v INTEGER,
     p_codigo INTEGER,
@@ -493,120 +626,3 @@ BEGIN
 
 END;
 $$ LANGUAGE plpgsql;
-
--- FUNCIÓN 2: Calcula el total de una venta (Necesario para reportes)
-CREATE OR REPLACE FUNCTION fruteria.calcular_total_venta(p_folio_v INTEGER)
-RETURNS NUMERIC(10, 2) AS $$
-DECLARE
-    total_venta NUMERIC(10, 2);
-BEGIN
-    SELECT 
-        COALESCE(SUM(dv.cantidad * p.precio_v), 0)
-    INTO total_venta
-    FROM fruteria.detalle_venta dv
-    JOIN fruteria.producto p ON dv.codigo = p.codigo
-    WHERE dv.folio_v = p_folio_v;
-
-    RETURN total_venta;
-END;
-$$ LANGUAGE plpgsql;
-
--- FUNCIÓN 3: Actualiza el stock y el precio de compra tras una adquisición (Para rol Almacén)
-CREATE OR REPLACE FUNCTION fruteria.registrar_detalle_y_aumentar_stock(
-    p_folio_c INTEGER,
-    p_codigo INTEGER,
-    p_cantidad INTEGER,
-    p_nuevo_precio_c NUMERIC(8,2)
-)
-RETURNS VOID AS $$
-BEGIN
-    -- 1. INSERTAR en la tabla detalle_compra
-    INSERT INTO fruteria.detalle_compra (folio_c, codigo, cantidad)
-    VALUES (p_folio_c, p_codigo, p_cantidad);
-
-    -- 2. ACTUALIZAR la existencia y precio de compra del producto
-    UPDATE fruteria.producto
-    SET 
-        existencia = existencia + p_cantidad,
-        precio_c = p_nuevo_precio_c
-    WHERE codigo = p_codigo;
-
-END;
-$$ LANGUAGE plpgsql;
-
--- FUNCIÓN 4: Obtiene el nombre completo del cliente (física o moral)
-CREATE OR REPLACE FUNCTION fruteria.obtener_nombre_cliente(p_id_c INTEGER)
-RETURNS VARCHAR(80) AS $$
-DECLARE
-    nombre_completo VARCHAR(80);
-BEGIN
-    -- Intenta obtener la Razón Social (P. Moral)
-    SELECT razon_social INTO nombre_completo FROM fruteria.p_moral WHERE id_c = p_id_c;
-    
-    -- Si no es P. Moral, intenta obtener el Nombre (P. Física)
-    IF nombre_completo IS NULL THEN
-        SELECT nombre INTO nombre_completo FROM fruteria.p_fisica WHERE id_c = p_id_c;
-    END IF;
-
-    -- Si no encuentra nada, devuelve un mensaje
-    IF nombre_completo IS NULL THEN
-        RETURN 'Cliente no registrado/eliminado';
-    ELSE
-        RETURN nombre_completo;
-    END IF;
-END;
-$$ LANGUAGE plpgsql;
-
-
--- 7. CREACIÓN DE DISPARADORES (TRIGGERS) - (Punto 6 del Criterio de Interfaz)
--------------------------------------------------------------
-
--- DISPARADOR 1, 2, 3: AUDITORÍA de INSERT, UPDATE, DELETE en la tabla Producto
--- Función de auditoría genérica
-CREATE OR REPLACE FUNCTION fruteria.auditar_cambio()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO fruteria.auditoria (nombre_tabla, operacion, usuario_bd)
-    VALUES (TG_TABLE_NAME, TG_OP, current_user);
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Trigger para INSERT en producto (1)
-CREATE TRIGGER producto_insert_audit
-AFTER INSERT ON fruteria.producto
-FOR EACH ROW
-EXECUTE FUNCTION fruteria.auditar_cambio();
-
--- Trigger para UPDATE en producto (2)
-CREATE TRIGGER producto_update_audit
-AFTER UPDATE ON fruteria.producto
-FOR EACH ROW
-EXECUTE FUNCTION fruteria.auditar_cambio();
-
--- Trigger para DELETE en producto (3)
-CREATE TRIGGER producto_delete_audit
-AFTER DELETE ON fruteria.producto
-FOR EACH ROW
-EXECUTE FUNCTION fruteria.auditar_cambio();
-
--- DISPARADOR 4: VERIFICACIÓN de Stock antes de INSERTAR en detalle_venta (aunque la Función 1 ya lo hace, esto refuerza)
-CREATE OR REPLACE FUNCTION fruteria.verificar_stock_trigger()
-RETURNS TRIGGER AS $$
-DECLARE
-    v_existencia INTEGER;
-BEGIN
-    SELECT existencia INTO v_existencia FROM fruteria.producto WHERE codigo = NEW.codigo;
-    
-    IF NEW.cantidad > v_existencia THEN
-        RAISE EXCEPTION 'No hay suficiente stock. Solicitado: %, Disponible: %', NEW.cantidad, v_existencia;
-    END IF;
-    
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER detalle_venta_stock_check
-BEFORE INSERT ON fruteria.detalle_venta
-FOR EACH ROW
-EXECUTE FUNCTION fruteria.verificar_stock_trigger();
