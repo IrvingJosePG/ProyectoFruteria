@@ -292,7 +292,6 @@ public class PuntoVenta extends javax.swing.JPanel {
         add(txtprecioventa, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, -1, -1));
 
         separadorcarrito.setForeground(new java.awt.Color(0, 0, 0));
-        separadorcarrito.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         add(separadorcarrito, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 180, 700, -1));
 
         tabladecarrito.setModel(new javax.swing.table.DefaultTableModel(

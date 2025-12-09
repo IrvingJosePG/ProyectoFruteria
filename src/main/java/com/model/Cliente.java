@@ -6,9 +6,13 @@ public class Cliente {
     private String telefono;
     private String rfc;
     private String domicilio;
-    private String nombre;
+    private String tipo;
+    private boolean estado;
 
+    private String nombre;
     
+    private String razonSocial;
+
     public Cliente(int id_c, String telefono, String rfc, String domicilio, String nombre) {
         this.id_c = id_c;
         this.telefono = telefono;
@@ -19,8 +23,24 @@ public class Cliente {
     
     // Constructor vacío (necesario para algunas operaciones)
     public Cliente() {}
-
     
+    
+    public boolean isEstado() {
+        return estado;
+    }
+
+    public void setEstado(boolean estado) {
+        this.estado = estado;
+    }
+    
+    public String getRazonSocial() {
+        return razonSocial;
+    }
+
+    public void setRazonSocial(String razonSocial) {
+        this.razonSocial = razonSocial;
+    }
+
     public int getId_c() {
         return id_c;
     }
@@ -59,6 +79,14 @@ public class Cliente {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+    
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
     
     // 💡 Método CRUCIAL para JComboBox:

@@ -38,10 +38,12 @@ public class MenuFruit extends javax.swing.JFrame {
         InventarioProducto pnlProducto = new InventarioProducto();
         HistorialCompras pnlCompras = new HistorialCompras();
         RegistrarCompra pnlregistrarc = new RegistrarCompra();
+        PestanaCliente pnlcliente = new PestanaCliente();
         panelcontenedor.add(pnlVentas, "Ventas");
         panelcontenedor.add(pnlProducto, "Producto");
         panelcontenedor.add(pnlCompras, "Compras");
         panelcontenedor.add(pnlregistrarc, "RegistrarCompra");
+        panelcontenedor.add(pnlcliente, "Cliente");
     }
     
     public void SetImageLabel(JLabel labelname, String root){
@@ -338,6 +340,9 @@ public class MenuFruit extends javax.swing.JFrame {
         clientestext.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         clientestext.setText("Clientes");
         clientestext.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                clientestextMouseClicked(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 clientestextMouseEntered(evt);
             }
@@ -558,6 +563,12 @@ public class MenuFruit extends javax.swing.JFrame {
     private void registrarcompraMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_registrarcompraMouseExited
         button7.setBackground(new Color(254, 222, 95));
     }//GEN-LAST:event_registrarcompraMouseExited
+
+    private void clientestextMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_clientestextMouseClicked
+        cardLayout.show(panelcontenedor, "Cliente");
+        resetButtonColors();
+        button4.setBackground(new Color(124, 123, 174));
+    }//GEN-LAST:event_clientestextMouseClicked
 
     private void resetButtonColors() {
     Color defaultColor = new Color(254, 222, 95); // Amarillo original

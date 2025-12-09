@@ -51,7 +51,8 @@ CREATE TABLE cliente(
     id_c SERIAL PRIMARY KEY, -- Usamos SERIAL para evitar el manejo manual de IDs
     telefono VARCHAR(12),
     rfc VARCHAR(16) UNIQUE, -- El RFC debe ser único
-    domicilio VARCHAR(50)
+    domicilio VARCHAR(50),
+    estado BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- Cliente de Tipo Persona Moral
@@ -649,5 +650,44 @@ BEGIN
     SET existencia = existencia + p_cantidad
     WHERE codigo = p_codigo_prod;
 
+END;
+$$ LANGUAGE plpgsql;
+
+-- FUNCIÓN 3: BUSCAR ID DE CLIENTE POR RFC O NOMBRE
+-- Devuelve el ID del cliente o NULL si no se encuentra.
+CREATE OR REPLACE FUNCTION fruteria.obtener_id_cliente_por_identificador(
+    p_identificador TEXT -- Puede ser RFC, Nombre, o Razón Social
+)
+RETURNS INTEGER AS $$
+DECLARE
+    v_id_c INTEGER;
+BEGIN
+    -- 1. Buscar en la tabla principal de cliente por RFC (esto debería ser la clave)
+    SELECT id_c INTO v_id_c
+    FROM fruteria.cliente
+    WHERE rfc ILIKE '%' || p_identificador || '%' -- Búsqueda exacta o parcial del RFC
+    LIMIT 1;
+
+    IF v_id_c IS NOT NULL THEN
+        RETURN v_id_c;
+    END IF;
+    
+    -- 2. Buscar en Persona Física por nombre o apellidos
+    SELECT id_c INTO v_id_c
+    FROM fruteria.p_fisica
+    WHERE nombre ILIKE '%' || p_identificador || '%'
+    LIMIT 1;
+
+    IF v_id_c IS NOT NULL THEN
+        RETURN v_id_c;
+    END IF;
+
+    -- 3. Buscar en Persona Moral por Razón Social
+    SELECT id_c INTO v_id_c
+    FROM fruteria.p_moral
+    WHERE razon_social ILIKE '%' || p_identificador || '%'
+    LIMIT 1;
+
+    RETURN v_id_c; -- Devuelve el ID encontrado (o NULL si no se encuentra)
 END;
 $$ LANGUAGE plpgsql;
