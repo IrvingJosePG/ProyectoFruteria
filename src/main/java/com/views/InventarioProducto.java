@@ -132,10 +132,10 @@ public class InventarioProducto extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(tableproductos);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 15, 490, 150));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 15, 660, 150));
 
         separador.setForeground(new java.awt.Color(0, 0, 0));
-        add(separador, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 170, 510, -1));
+        add(separador, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 170, 700, -1));
 
         pnleditar.setBackground(new java.awt.Color(124, 123, 174));
 
@@ -169,7 +169,7 @@ public class InventarioProducto extends javax.swing.JPanel {
         buttondelete.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
         buttondelete.setForeground(new java.awt.Color(255, 255, 255));
         buttondelete.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        buttondelete.setText("ELIMINAR");
+        buttondelete.setText("BORRAR");
         buttondelete.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 buttondeleteMouseClicked(evt);

@@ -293,7 +293,7 @@ public class PuntoVenta extends javax.swing.JPanel {
 
         separadorcarrito.setForeground(new java.awt.Color(0, 0, 0));
         separadorcarrito.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        add(separadorcarrito, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 180, 510, 5));
+        add(separadorcarrito, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 180, 700, -1));
 
         tabladecarrito.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -317,7 +317,7 @@ public class PuntoVenta extends javax.swing.JPanel {
         add(totalventa, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 300, -1, -1));
 
         txtcliente.setText("Cliente:");
-        add(txtcliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 300, -1, 20));
+        add(txtcliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 360, -1, 20));
 
         panelfinalizarventa.setBackground(new java.awt.Color(124, 123, 174));
 
@@ -343,7 +343,7 @@ public class PuntoVenta extends javax.swing.JPanel {
             .addComponent(finalizarventa, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
         );
 
-        add(panelfinalizarventa, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 325, 160, 25));
+        add(panelfinalizarventa, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 340, 160, 25));
 
         pnlcarrito.setBackground(new java.awt.Color(124, 123, 174));
 
@@ -409,12 +409,12 @@ public class PuntoVenta extends javax.swing.JPanel {
         productoprecioc.setText("-----");
         add(productoprecioc, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 150, -1, -1));
 
-        add(clienteregistrados1, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 300, 250, 20));
+        add(clienteregistrados1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 360, 250, 20));
 
         txtempleado.setText("Empleado:");
         add(txtempleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 330, -1, 20));
 
-        add(empleadosregistrados, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 330, 220, 20));
+        add(empleadosregistrados, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 330, 250, 20));
     }// </editor-fold>//GEN-END:initComponents
 
     private void buscarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buscarMouseClicked

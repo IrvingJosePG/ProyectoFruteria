@@ -631,3 +631,23 @@ BEGIN
 
 END;
 $$ LANGUAGE plpgsql;
+
+-- FUNCIÓN 2: Maneja la transacción completa de una Compra.
+CREATE OR REPLACE FUNCTION fruteria.registrar_detalle_compra_y_stock(
+    p_folio_c INTEGER,
+    p_codigo_prod INTEGER,
+    p_cantidad INTEGER
+)
+RETURNS VOID AS $$
+BEGIN
+    -- 1. Insertar en detalle_compra
+    INSERT INTO fruteria.detalle_compra (folio_c, codigo, cantidad)
+    VALUES (p_folio_c, p_codigo_prod, p_cantidad);
+
+    -- 2. Actualizar existencia en producto
+    UPDATE fruteria.producto
+    SET existencia = existencia + p_cantidad
+    WHERE codigo = p_codigo_prod;
+
+END;
+$$ LANGUAGE plpgsql;
