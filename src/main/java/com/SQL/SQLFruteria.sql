@@ -691,3 +691,22 @@ BEGIN
     RETURN v_id_c; -- Devuelve el ID encontrado (o NULL si no se encuentra)
 END;
 $$ LANGUAGE plpgsql;
+
+-- FUNCIÓN 4: Esta función calcula el monto total de una venta específica, 
+-- identificada por su folio_v.
+CREATE OR REPLACE FUNCTION fruteria.calcular_total_venta(
+    p_folio_v INTEGER
+)
+RETURNS NUMERIC AS $$
+DECLARE
+    v_total NUMERIC := 0.0;
+BEGIN
+    SELECT SUM(dv.cantidad * p.precio_v)
+    INTO v_total
+    FROM fruteria.detalle_venta dv
+    JOIN fruteria.producto p ON dv.codigo = p.codigo
+    WHERE dv.folio_v = p_folio_v;
+
+    RETURN COALESCE(v_total, 0.0);
+END;
+$$ LANGUAGE plpgsql;

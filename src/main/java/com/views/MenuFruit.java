@@ -39,11 +39,13 @@ public class MenuFruit extends javax.swing.JFrame {
         HistorialCompras pnlCompras = new HistorialCompras();
         RegistrarCompra pnlregistrarc = new RegistrarCompra();
         PestanaCliente pnlcliente = new PestanaCliente();
+        ReporteVentas pnlreporteventas = new ReporteVentas();
         panelcontenedor.add(pnlVentas, "Ventas");
         panelcontenedor.add(pnlProducto, "Producto");
         panelcontenedor.add(pnlCompras, "Compras");
         panelcontenedor.add(pnlregistrarc, "RegistrarCompra");
         panelcontenedor.add(pnlcliente, "Cliente");
+        panelcontenedor.add(pnlreporteventas, "ReporteVentas");
     }
     
     public void SetImageLabel(JLabel labelname, String root){
@@ -369,8 +371,11 @@ public class MenuFruit extends javax.swing.JFrame {
         reportexx.setBackground(new java.awt.Color(124, 123, 242));
         reportexx.setFont(new java.awt.Font("Helvetica Neue", 1, 16)); // NOI18N
         reportexx.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        reportexx.setText("Reportes");
+        reportexx.setText("Reporte de Ventas");
         reportexx.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                reportexxMouseClicked(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 reportexxMouseEntered(evt);
             }
@@ -569,6 +574,12 @@ public class MenuFruit extends javax.swing.JFrame {
         resetButtonColors();
         button4.setBackground(new Color(124, 123, 174));
     }//GEN-LAST:event_clientestextMouseClicked
+
+    private void reportexxMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reportexxMouseClicked
+        cardLayout.show(panelcontenedor, "ReporteVentas");
+        resetButtonColors();
+        button5.setBackground(new Color(124, 123, 174));
+    }//GEN-LAST:event_reportexxMouseClicked
 
     private void resetButtonColors() {
     Color defaultColor = new Color(254, 222, 95); // Amarillo original
