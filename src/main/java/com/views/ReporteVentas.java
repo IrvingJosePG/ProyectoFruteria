@@ -1,11 +1,7 @@
 package com.views;
 
-import com.DAO.ClienteDAO;
 import com.DAO.ReporteDAO;
-import com.model.Cliente;
 import com.model.ReporteVenta;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.List;
 import javax.swing.JOptionPane;

@@ -40,12 +40,14 @@ public class MenuFruit extends javax.swing.JFrame {
         RegistrarCompra pnlregistrarc = new RegistrarCompra();
         PestanaCliente pnlcliente = new PestanaCliente();
         ReporteVentas pnlreporteventas = new ReporteVentas();
+        PestanaAuditoria pnlauditoria = new PestanaAuditoria();
         panelcontenedor.add(pnlVentas, "Ventas");
         panelcontenedor.add(pnlProducto, "Producto");
         panelcontenedor.add(pnlCompras, "Compras");
         panelcontenedor.add(pnlregistrarc, "RegistrarCompra");
         panelcontenedor.add(pnlcliente, "Cliente");
         panelcontenedor.add(pnlreporteventas, "ReporteVentas");
+        panelcontenedor.add(pnlauditoria, "Auditoria");
     }
     
     public void SetImageLabel(JLabel labelname, String root){
@@ -105,7 +107,7 @@ public class MenuFruit extends javax.swing.JFrame {
         historialcomprastext.setVisible(false);
         clientestext.setVisible(false);
         reportexx.setVisible(false);
-        empleadotext.setVisible(false);
+        auditoriatext.setVisible(false);
 
         switch (rol) {
             case "Administrador":
@@ -114,7 +116,7 @@ public class MenuFruit extends javax.swing.JFrame {
                 historialcomprastext.setVisible(true);
                 clientestext.setVisible(true);
                 reportexx.setVisible(true);
-                empleadotext.setVisible(true);
+                auditoriatext.setVisible(true);
                 break;
 
             case "Supervisor":
@@ -168,9 +170,11 @@ public class MenuFruit extends javax.swing.JFrame {
         button5 = new javax.swing.JPanel();
         reportexx = new javax.swing.JLabel();
         button6 = new javax.swing.JPanel();
-        empleadotext = new javax.swing.JLabel();
+        auditoriatext = new javax.swing.JLabel();
         button7 = new javax.swing.JPanel();
         registrarcompra = new javax.swing.JLabel();
+        button8 = new javax.swing.JPanel();
+        empleadotext1 = new javax.swing.JLabel();
         panelcontenedor = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -399,16 +403,19 @@ public class MenuFruit extends javax.swing.JFrame {
 
         button6.setBackground(new java.awt.Color(254, 222, 95));
 
-        empleadotext.setBackground(new java.awt.Color(124, 123, 242));
-        empleadotext.setFont(new java.awt.Font("Helvetica Neue", 1, 16)); // NOI18N
-        empleadotext.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        empleadotext.setText("Empleados");
-        empleadotext.addMouseListener(new java.awt.event.MouseAdapter() {
+        auditoriatext.setBackground(new java.awt.Color(124, 123, 242));
+        auditoriatext.setFont(new java.awt.Font("Helvetica Neue", 1, 16)); // NOI18N
+        auditoriatext.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        auditoriatext.setText("Tabla de Auditoria");
+        auditoriatext.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                auditoriatextMouseClicked(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                empleadotextMouseEntered(evt);
+                auditoriatextMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                empleadotextMouseExited(evt);
+                auditoriatextMouseExited(evt);
             }
         });
 
@@ -416,11 +423,11 @@ public class MenuFruit extends javax.swing.JFrame {
         button6.setLayout(button6Layout);
         button6Layout.setHorizontalGroup(
             button6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(empleadotext, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
+            .addComponent(auditoriatext, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
         );
         button6Layout.setVerticalGroup(
             button6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(empleadotext, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+            .addComponent(auditoriatext, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
         );
 
         mainbar.add(button6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 440, 160, 40));
@@ -455,6 +462,34 @@ public class MenuFruit extends javax.swing.JFrame {
         );
 
         mainbar.add(button7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 290, 160, 40));
+
+        button8.setBackground(new java.awt.Color(254, 222, 95));
+
+        empleadotext1.setBackground(new java.awt.Color(124, 123, 242));
+        empleadotext1.setFont(new java.awt.Font("Helvetica Neue", 1, 16)); // NOI18N
+        empleadotext1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        empleadotext1.setText("Empleados");
+        empleadotext1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                empleadotext1MouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                empleadotext1MouseExited(evt);
+            }
+        });
+
+        javax.swing.GroupLayout button8Layout = new javax.swing.GroupLayout(button8);
+        button8.setLayout(button8Layout);
+        button8Layout.setHorizontalGroup(
+            button8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(empleadotext1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
+        );
+        button8Layout.setVerticalGroup(
+            button8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(empleadotext1, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+        );
+
+        mainbar.add(button8, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 490, 160, 40));
 
         gb.add(mainbar, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 160, 600));
 
@@ -529,13 +564,13 @@ public class MenuFruit extends javax.swing.JFrame {
         button5.setBackground(new Color(254, 222, 95));
     }//GEN-LAST:event_reportexxMouseExited
 
-    private void empleadotextMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_empleadotextMouseEntered
+    private void auditoriatextMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_auditoriatextMouseEntered
         button6.setBackground(new Color(124, 123, 174));
-    }//GEN-LAST:event_empleadotextMouseEntered
+    }//GEN-LAST:event_auditoriatextMouseEntered
 
-    private void empleadotextMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_empleadotextMouseExited
+    private void auditoriatextMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_auditoriatextMouseExited
         button6.setBackground(new Color(254, 222, 95));
-    }//GEN-LAST:event_empleadotextMouseExited
+    }//GEN-LAST:event_auditoriatextMouseExited
 
     private void puntoventatextMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_puntoventatextMouseClicked
         cardLayout.show(panelcontenedor, "Ventas");
@@ -580,6 +615,20 @@ public class MenuFruit extends javax.swing.JFrame {
         resetButtonColors();
         button5.setBackground(new Color(124, 123, 174));
     }//GEN-LAST:event_reportexxMouseClicked
+
+    private void empleadotext1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_empleadotext1MouseEntered
+        // TODO add your handling code here:
+    }//GEN-LAST:event_empleadotext1MouseEntered
+
+    private void empleadotext1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_empleadotext1MouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_empleadotext1MouseExited
+
+    private void auditoriatextMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_auditoriatextMouseClicked
+        cardLayout.show(panelcontenedor, "Auditoria");
+        resetButtonColors();
+        button6.setBackground(new Color(124, 123, 174));
+    }//GEN-LAST:event_auditoriatextMouseClicked
 
     private void resetButtonColors() {
     Color defaultColor = new Color(254, 222, 95); // Amarillo original
@@ -627,6 +676,7 @@ public class MenuFruit extends javax.swing.JFrame {
     } */
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel auditoriatext;
     private javax.swing.JPanel button1;
     private javax.swing.JPanel button2;
     private javax.swing.JPanel button3;
@@ -634,8 +684,9 @@ public class MenuFruit extends javax.swing.JFrame {
     private javax.swing.JPanel button5;
     private javax.swing.JPanel button6;
     private javax.swing.JPanel button7;
+    private javax.swing.JPanel button8;
     private javax.swing.JLabel clientestext;
-    private javax.swing.JLabel empleadotext;
+    private javax.swing.JLabel empleadotext1;
     private javax.swing.JPanel encabezado;
     private javax.swing.JLabel fechaactual;
     private javax.swing.JPanel gb;

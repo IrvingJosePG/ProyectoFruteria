@@ -76,47 +76,6 @@ public class ReporteDAO {
     }
     
     /**
-     * Requisito 6: Obtener los datos de la tabla de auditoría (Disparadores).
-     * @return Vector de Vectores con los datos de auditoría.
-     * @throws SQLException
-     
-    public Vector<Vector<Object>> obtenerAuditoria() throws SQLException {
-        Vector<Vector<Object>> data = new Vector<>();
-        Connection conn = null;
-
-        // Consulta de la tabla de auditoría (asumiendo que existe)
-        String sql = "SELECT id_auditoria, tabla_afectada, operacion, usuario, fecha_registro, datos_viejos "
-                   + "FROM fruteria.auditoria "
-                   + "ORDER BY fecha_registro DESC";
-
-        try {
-            conn = Conexion.getInstance().getConnection();
-            try (PreparedStatement ps = conn.prepareStatement(sql);
-                 ResultSet rs = ps.executeQuery()) {
-
-                while (rs.next()) {
-                    Vector<Object> row = new Vector<>();
-                    row.add(rs.getInt("id_auditoria"));
-                    row.add(rs.getString("tabla_afectada"));
-                    row.add(rs.getString("operacion"));
-                    row.add(rs.getString("usuario"));
-                    row.add(rs.getTimestamp("fecha_registro"));
-                    row.add(rs.getString("datos_viejos"));
-                    data.add(row);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al obtener datos de auditoría: " + e.getMessage());
-            throw e;
-        } finally {
-            if (conn != null) {
-                conn.close();
-            }
-        }
-        return data;
-    }
-
-    /**
      * Llama a la Función 4 SQL para calcular el total de una venta.
      * @param folio_v Folio de la venta.
      * @return El monto total de la venta.

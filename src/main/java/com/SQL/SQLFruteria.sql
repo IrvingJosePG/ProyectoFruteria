@@ -122,7 +122,9 @@ CREATE TABLE auditoria (
     nombre_tabla VARCHAR(50) NOT NULL,
     operacion VARCHAR(10) NOT NULL,
     usuario_bd VARCHAR(50) NOT NULL,
-    fecha_auditoria TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW()
+    fecha_auditoria TIMESTAMP NOT NULL DEFAULT NOW(),
+    datos_anteriores JSONB,
+    datos_nuevos JSONB
 );
 
 
@@ -710,3 +712,102 @@ BEGIN
     RETURN COALESCE(v_total, 0.0);
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+---FUNCION: Registra el nombre de la tabla, la operación y el usuario que hizo el cambio
+CREATE OR REPLACE FUNCTION fruteria.auditar_cambios()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO fruteria.auditoria(nombre_tabla, operacion, usuario_bd)
+    VALUES (TG_TABLE_NAME, TG_OP, current_user);
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- TIGGERS DE AUDITORIA EN TABLAS
+CREATE TRIGGER tr_auditoria_producto
+AFTER INSERT OR UPDATE OR DELETE ON fruteria.producto
+FOR EACH ROW
+EXECUTE PROCEDURE fruteria.auditar_cambios();
+
+
+CREATE TRIGGER tr_aud_cliente
+AFTER INSERT OR UPDATE OR DELETE ON fruteria.cliente
+FOR EACH ROW
+EXECUTE FUNCTION fruteria.auditar_cambios();
+
+
+CREATE TRIGGER tr_aud_p_fisica
+AFTER INSERT OR UPDATE OR DELETE ON fruteria.p_fisica
+FOR EACH ROW
+EXECUTE FUNCTION fruteria.auditar_cambios();
+
+
+CREATE TRIGGER tr_aud_p_moral
+AFTER INSERT OR UPDATE OR DELETE ON fruteria.p_moral
+FOR EACH ROW
+EXECUTE FUNCTION fruteria.auditar_cambios();
+
+
+CREATE TRIGGER tr_aud_empleado
+AFTER INSERT OR UPDATE OR DELETE ON fruteria.empleado
+FOR EACH ROW
+EXECUTE FUNCTION fruteria.auditar_cambios();
+
+
+CREATE TRIGGER tr_aud_venta
+AFTER INSERT OR UPDATE OR DELETE ON fruteria.venta
+FOR EACH ROW
+EXECUTE FUNCTION fruteria.auditar_cambios();
+
+
+CREATE TRIGGER tr_aud_detalle_venta
+AFTER INSERT OR UPDATE OR DELETE ON fruteria.detalle_venta
+FOR EACH ROW
+EXECUTE FUNCTION fruteria.auditar_cambios();
+
+
+CREATE TRIGGER tr_aud_detalle_compra
+AFTER INSERT OR UPDATE OR DELETE ON fruteria.detalle_compra
+FOR EACH ROW
+EXECUTE FUNCTION fruteria.auditar_cambios();
+
+
+-- FUNCION: Resta del inventario la cantidad vendida
+CREATE OR REPLACE FUNCTION fruteria.restar_stock()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE fruteria.producto
+    SET existencia = existencia - NEW.cantidad
+    WHERE codigo = NEW.codigo;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- TRIGGER: Se activa después de insertar un detalle de venta
+CREATE TRIGGER tr_restar_stock
+AFTER INSERT ON fruteria.detalle_venta
+FOR EACH ROW
+EXECUTE FUNCTION fruteria.restar_stock();
+
+
+-- FUNCION: Suma al inventario la cantidad comprada
+CREATE OR REPLACE FUNCTION fruteria.sumar_stock()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE fruteria.producto
+    SET existencia = existencia + NEW.cantidad
+    WHERE codigo = NEW.codigo;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- TRIGGER: Se activa después de insertar un detalle de compra
+CREATE TRIGGER tr_sumar_stock
+AFTER INSERT ON fruteria.detalle_compra
+FOR EACH ROW
+EXECUTE FUNCTION fruteria.sumar_stock();
