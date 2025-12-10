@@ -811,3 +811,31 @@ CREATE TRIGGER tr_sumar_stock
 AFTER INSERT ON fruteria.detalle_compra
 FOR EACH ROW
 EXECUTE FUNCTION fruteria.sumar_stock();
+
+--FUNCION:Evitar que se venda más producto del que hay en inventario.
+CREATE OR REPLACE FUNCTION fruteria.validar_stock_venta()
+RETURNS TRIGGER AS $$
+DECLARE
+    stock_actual INTEGER;
+BEGIN
+    -- Obtener existencia actual
+    SELECT existencia INTO stock_actual
+    FROM fruteria.producto
+    WHERE codigo = NEW.codigo;
+
+    -- Validar stock
+    IF stock_actual < NEW.cantidad THEN
+        RAISE EXCEPTION 
+        'Stock insuficiente para el producto % (existencia: %, solicitado: %)', 
+        NEW.codigo, stock_actual, NEW.cantidad;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+--TIGGGER
+CREATE TRIGGER tr_validar_stock_venta
+BEFORE INSERT ON fruteria.detalle_venta
+FOR EACH ROW
+EXECUTE FUNCTION fruteria.validar_stock_venta();
