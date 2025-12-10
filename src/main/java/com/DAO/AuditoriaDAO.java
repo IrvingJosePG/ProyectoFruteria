@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.DAO;
 
 import com.conexion.Conexion;
@@ -13,10 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author irvingjose
- */
 public class AuditoriaDAO {
     public List<Auditoria> obtenerAuditoria() throws SQLException {
         List<Auditoria> lista = new ArrayList<>();

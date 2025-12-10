@@ -716,7 +716,7 @@ $$ LANGUAGE plpgsql;
 
 
 ---FUNCION: Registra el nombre de la tabla, la operación y el usuario que hizo el cambio
-CREATE OR REPLACE FUNCTION fruteria.auditar_cambios()
+CREATE OR REPLACE FUNCTION fruteria.auditar_cambios() 
 RETURNS TRIGGER AS $$
 BEGIN
     INSERT INTO fruteria.auditoria(nombre_tabla, operacion, usuario_bd)
