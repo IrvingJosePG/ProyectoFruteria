@@ -41,6 +41,7 @@ public class MenuFruit extends javax.swing.JFrame {
         PestanaCliente pnlcliente = new PestanaCliente();
         ReporteVentas pnlreporteventas = new ReporteVentas();
         PestanaAuditoria pnlauditoria = new PestanaAuditoria();
+        paneldefault pnlpaneldefault = new paneldefault();
         panelcontenedor.add(pnlVentas, "Ventas");
         panelcontenedor.add(pnlProducto, "Producto");
         panelcontenedor.add(pnlCompras, "Compras");
@@ -48,6 +49,9 @@ public class MenuFruit extends javax.swing.JFrame {
         panelcontenedor.add(pnlcliente, "Cliente");
         panelcontenedor.add(pnlreporteventas, "ReporteVentas");
         panelcontenedor.add(pnlauditoria, "Auditoria");
+        panelcontenedor.add(pnlpaneldefault, "default");
+        
+        cardLayout.show(panelcontenedor, "default");
     }
     
     public void SetImageLabel(JLabel labelname, String root){
@@ -59,7 +63,7 @@ public class MenuFruit extends javax.swing.JFrame {
     
     private String obtenerGrupoFuncional(String usuario) {
         // Definimos los grupos (roles) que vamos a verificar en PostgreSQL
-        String[] grupos = {"administrador_sistema", "supervisor", "vendedor"}; 
+        String[] grupos = {"administrador_sistema", "supervisor", "vendedor", "almacen"}; 
 
         // Consulta SQL para verificar si el usuario es miembro de un rol
         String sql = "SELECT 1 FROM pg_auth_members m JOIN pg_roles g ON m.roleid = g.oid "
@@ -84,6 +88,8 @@ public class MenuFruit extends javax.swing.JFrame {
                                 return "Supervisor";
                             } else if (grupo.equals("vendedor")) { // Tu rol de grupo "vendedor"
                                 return "Vendedor";
+                            }else if (grupo.equals("almacen")) { // Tu rol de grupo "vendedor"
+                                return "Almacen";
                             }
                         }
                     }
@@ -105,30 +111,53 @@ public class MenuFruit extends javax.swing.JFrame {
         puntoventatext.setVisible(false);
         productotext.setVisible(false);
         historialcomprastext.setVisible(false);
+        registrarcompra.setVisible(false);
         clientestext.setVisible(false);
         reportexx.setVisible(false);
         auditoriatext.setVisible(false);
 
+        // 2. Habilitar la visibilidad según el rol.
         switch (rol) {
             case "Administrador":
+                // El Administrador tiene acceso total a todas las funciones.
                 puntoventatext.setVisible(true);
                 productotext.setVisible(true);
                 historialcomprastext.setVisible(true);
+                registrarcompra.setVisible(true); // Permiso para registrar compras a proveedores
                 clientestext.setVisible(true);
-                reportexx.setVisible(true);
-                auditoriatext.setVisible(true);
+                reportexx.setVisible(true); // Acceso a reportes detallados
+                auditoriatext.setVisible(true); // Acceso a la auditoría del sistema
                 break;
 
             case "Supervisor":
+                // El Supervisor tiene acceso operativo y de análisis (ventas, productos, reportes, clientes).
+                // Se excluyen las funciones de alto nivel (Registrar Compra, Auditoría).
                 puntoventatext.setVisible(true);
                 productotext.setVisible(true);
                 historialcomprastext.setVisible(true);
                 clientestext.setVisible(true);
                 reportexx.setVisible(true);
+                // registrarcompra y auditoriatext permanecen en false
+                break;
+
+            case "Almacen":
+                // El personal de Almacén se enfoca en el inventario y las compras a proveedores.
+                productotext.setVisible(true); // Gestionar/Consultar inventario
+                historialcomprastext.setVisible(true); // Revisar historial de compras (proveedores)
+                registrarcompra.setVisible(true); // Registrar la entrada de nueva mercancía
+                // No tienen acceso a Punto de Venta, Clientes, Reportes o Auditoría.
+                break;
+
+            case "Vendedor":
+                // El Vendedor se enfoca en la transacción con el cliente.
+                puntoventatext.setVisible(true); // La función principal
+                productotext.setVisible(true); // Consultar stock y precios
+                clientestext.setVisible(true); // Registrar o consultar clientes
+                // No tienen acceso a Compras, Reportes o Auditoría.
                 break;
 
             default:
-                button1.setVisible(true);
+                // Para cualquier otro rol desconocido, todas las pestañas permanecen ocultas.
                 break;
         }
     }
@@ -173,8 +202,6 @@ public class MenuFruit extends javax.swing.JFrame {
         auditoriatext = new javax.swing.JLabel();
         button7 = new javax.swing.JPanel();
         registrarcompra = new javax.swing.JLabel();
-        button8 = new javax.swing.JPanel();
-        empleadotext1 = new javax.swing.JLabel();
         panelcontenedor = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -306,7 +333,7 @@ public class MenuFruit extends javax.swing.JFrame {
             .addComponent(productotext, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
         );
 
-        mainbar.add(button2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 190, 160, 40));
+        mainbar.add(button2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 200, 160, 40));
 
         button3.setBackground(new java.awt.Color(254, 222, 95));
 
@@ -337,7 +364,7 @@ public class MenuFruit extends javax.swing.JFrame {
             .addComponent(historialcomprastext, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
         );
 
-        mainbar.add(button3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 160, 40));
+        mainbar.add(button3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 260, 160, 40));
 
         button4.setBackground(new java.awt.Color(254, 222, 95));
 
@@ -368,7 +395,7 @@ public class MenuFruit extends javax.swing.JFrame {
             .addComponent(clientestext, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
         );
 
-        mainbar.add(button4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 340, 160, 40));
+        mainbar.add(button4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 380, 160, 40));
 
         button5.setBackground(new java.awt.Color(254, 222, 95));
 
@@ -399,7 +426,7 @@ public class MenuFruit extends javax.swing.JFrame {
             .addComponent(reportexx, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
         );
 
-        mainbar.add(button5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 390, 160, 40));
+        mainbar.add(button5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 440, 160, 40));
 
         button6.setBackground(new java.awt.Color(254, 222, 95));
 
@@ -430,7 +457,7 @@ public class MenuFruit extends javax.swing.JFrame {
             .addComponent(auditoriatext, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
         );
 
-        mainbar.add(button6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 440, 160, 40));
+        mainbar.add(button6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 500, 160, 40));
 
         button7.setBackground(new java.awt.Color(254, 222, 95));
 
@@ -461,35 +488,7 @@ public class MenuFruit extends javax.swing.JFrame {
             .addComponent(registrarcompra, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
         );
 
-        mainbar.add(button7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 290, 160, 40));
-
-        button8.setBackground(new java.awt.Color(254, 222, 95));
-
-        empleadotext1.setBackground(new java.awt.Color(124, 123, 242));
-        empleadotext1.setFont(new java.awt.Font("Helvetica Neue", 1, 16)); // NOI18N
-        empleadotext1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        empleadotext1.setText("Empleados");
-        empleadotext1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                empleadotext1MouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                empleadotext1MouseExited(evt);
-            }
-        });
-
-        javax.swing.GroupLayout button8Layout = new javax.swing.GroupLayout(button8);
-        button8.setLayout(button8Layout);
-        button8Layout.setHorizontalGroup(
-            button8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(empleadotext1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
-        );
-        button8Layout.setVerticalGroup(
-            button8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(empleadotext1, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-        );
-
-        mainbar.add(button8, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 490, 160, 40));
+        mainbar.add(button7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 320, 160, 40));
 
         gb.add(mainbar, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 160, 600));
 
@@ -616,14 +615,6 @@ public class MenuFruit extends javax.swing.JFrame {
         button5.setBackground(new Color(124, 123, 174));
     }//GEN-LAST:event_reportexxMouseClicked
 
-    private void empleadotext1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_empleadotext1MouseEntered
-        // TODO add your handling code here:
-    }//GEN-LAST:event_empleadotext1MouseEntered
-
-    private void empleadotext1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_empleadotext1MouseExited
-        // TODO add your handling code here:
-    }//GEN-LAST:event_empleadotext1MouseExited
-
     private void auditoriatextMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_auditoriatextMouseClicked
         cardLayout.show(panelcontenedor, "Auditoria");
         resetButtonColors();
@@ -684,9 +675,7 @@ public class MenuFruit extends javax.swing.JFrame {
     private javax.swing.JPanel button5;
     private javax.swing.JPanel button6;
     private javax.swing.JPanel button7;
-    private javax.swing.JPanel button8;
     private javax.swing.JLabel clientestext;
-    private javax.swing.JLabel empleadotext1;
     private javax.swing.JPanel encabezado;
     private javax.swing.JLabel fechaactual;
     private javax.swing.JPanel gb;
