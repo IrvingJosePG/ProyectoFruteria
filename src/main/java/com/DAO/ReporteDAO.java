@@ -2,6 +2,7 @@ package com.DAO;
 
 import com.conexion.Conexion;
 import com.model.ReporteVenta;
+import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -122,29 +123,37 @@ public class ReporteDAO {
      * @throws SQLException
      */
     public double calcularTotalVenta(int folio_v) throws SQLException {
-        Connection conn = null;
-        double total = 0.0;
-        String sqlCall = "{? = CALL fruteria.calcular_total_venta(?)}";
-        
-        try {
-            conn = Conexion.getInstance().getConnection();
-            try (CallableStatement cs = conn.prepareCall(sqlCall)) {
-                
-                cs.registerOutParameter(1, java.sql.Types.NUMERIC);
-                cs.setInt(2, folio_v);
-                
-                cs.execute();
-                
-                total = cs.getDouble(1);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al calcular total de venta: " + e.getMessage());
-            throw e;
-        } finally {
-            if (conn != null) {
-                conn.close();
-            }
+    Connection conn = null;
+    double total = 0.0;
+
+    String sqlCall = "{ ? = CALL fruteria.calcular_total_venta(?) }";
+
+    try {
+        conn = Conexion.getInstance().getConnection();
+
+        try (CallableStatement cs = conn.prepareCall(sqlCall)) {
+
+            // 1. Registrar salida NUMERIC
+            cs.registerOutParameter(1, java.sql.Types.NUMERIC);
+            // 2. Parámetro de entrada
+            cs.setInt(2, folio_v);
+            // 3. Ejecutar
+            cs.execute();
+            // 4. Obtener como BigDecimal (obligatorio)
+            BigDecimal bd = cs.getBigDecimal(1);
+            // 5. Convertir a double
+            total = (bd != null) ? bd.doubleValue() : 0.0;
         }
-        return total;
+
+    } catch (SQLException e) {
+        System.err.println("Error al calcular total de venta: " + e.getMessage());
+        throw e;
+
+    } finally {
+        if (conn != null) conn.close();
     }
+
+    return total;
+}
+
 }

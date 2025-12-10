@@ -4,6 +4,9 @@ import com.DAO.ClienteDAO;
 import com.DAO.ReporteDAO;
 import com.model.Cliente;
 import com.model.ReporteVenta;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -75,8 +78,40 @@ public class ReporteVentas extends javax.swing.JPanel {
         }
     }
     
-    
-
+    private void calcularTotalDeVenta() {
+        String folioTexto = txtFolioVenta.getText().trim();
+        if (folioTexto.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese un Folio de Venta.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            lblTotalCalculado.setText("----");
+            return;
+        }
+        
+        try {
+            int folio = Integer.parseInt(folioTexto);
+            
+            // Llama al método DAO que a su vez llama a la Función 4 SQL
+            double total = reportedao.calcularTotalVenta(folio);
+            
+            if (total > 0) {
+                lblTotalCalculado.setText("$ " + String.format("%,.2f", total));
+            } else {
+                 lblTotalCalculado.setText("FOLIO NO ENCONTRADO");
+                 JOptionPane.showMessageDialog(this, 
+                    "No se encontró el folio " + folio + " o la venta es cero.", 
+                    "Resultado", JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "El Folio debe ser un número entero válido.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);
+            lblTotalCalculado.setText("ERROR");
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, 
+                "Error de Base de Datos al calcular total: " + ex.getMessage(), 
+                "Error SQL", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+            lblTotalCalculado.setText("ERROR DB");
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -89,11 +124,11 @@ public class ReporteVentas extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaventas = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
-        pnlsearch = new javax.swing.JPanel();
+        btnCalcularVenta = new javax.swing.JPanel();
         buttonsearch = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        lblTotalCalculado = new javax.swing.JLabel();
+        txtFolioVenta = new javax.swing.JTextField();
 
         setBackground(new java.awt.Color(252, 249, 235));
         setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Reporte de Ventas", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 1, 13))); // NOI18N
@@ -115,9 +150,9 @@ public class ReporteVentas extends javax.swing.JPanel {
         add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 680, 340));
 
         jLabel1.setText("Folio de Venta:");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, -1, -1));
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 35, -1, 25));
 
-        pnlsearch.setBackground(new java.awt.Color(124, 123, 174));
+        btnCalcularVenta.setBackground(new java.awt.Color(124, 123, 174));
 
         buttonsearch.setBackground(new java.awt.Color(124, 123, 174));
         buttonsearch.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
@@ -131,40 +166,40 @@ public class ReporteVentas extends javax.swing.JPanel {
             }
         });
 
-        javax.swing.GroupLayout pnlsearchLayout = new javax.swing.GroupLayout(pnlsearch);
-        pnlsearch.setLayout(pnlsearchLayout);
-        pnlsearchLayout.setHorizontalGroup(
-            pnlsearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout btnCalcularVentaLayout = new javax.swing.GroupLayout(btnCalcularVenta);
+        btnCalcularVenta.setLayout(btnCalcularVentaLayout);
+        btnCalcularVentaLayout.setHorizontalGroup(
+            btnCalcularVentaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(buttonsearch, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
         );
-        pnlsearchLayout.setVerticalGroup(
-            pnlsearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        btnCalcularVentaLayout.setVerticalGroup(
+            btnCalcularVentaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(buttonsearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        add(pnlsearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 35, 140, 20));
+        add(btnCalcularVenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 35, -1, 25));
 
         jLabel2.setText("Total Calculado");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 40, -1, -1));
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 35, -1, 25));
 
-        jLabel3.setText("----");
-        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 40, -1, -1));
-        add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 40, -1, -1));
+        lblTotalCalculado.setText("----");
+        add(lblTotalCalculado, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 35, -1, 25));
+        add(txtFolioVenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 35, 100, 25));
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonsearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonsearchMouseClicked
-
+        calcularTotalDeVenta();
     }//GEN-LAST:event_buttonsearchMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel btnCalcularVenta;
     private javax.swing.JLabel buttonsearch;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JPanel pnlsearch;
+    private javax.swing.JLabel lblTotalCalculado;
     private javax.swing.JTable tablaventas;
+    private javax.swing.JTextField txtFolioVenta;
     // End of variables declaration//GEN-END:variables
 }
