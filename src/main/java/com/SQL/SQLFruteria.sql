@@ -713,9 +713,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+--TIGGER FUCTIONS
 
-
----FUNCION: Registra el nombre de la tabla, la operación y el usuario que hizo el cambio
+---1. FUNCION: Registra el nombre de la tabla, la operación y el usuario que hizo el cambio
 CREATE OR REPLACE FUNCTION fruteria.auditar_cambios() 
 RETURNS TRIGGER AS $$
 BEGIN
@@ -775,7 +775,7 @@ FOR EACH ROW
 EXECUTE FUNCTION fruteria.auditar_cambios();
 
 
--- FUNCION: Resta del inventario la cantidad vendida
+-- 2. FUNCION: Resta del inventario la cantidad vendida
 CREATE OR REPLACE FUNCTION fruteria.restar_stock()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -794,7 +794,7 @@ FOR EACH ROW
 EXECUTE FUNCTION fruteria.restar_stock();
 
 
--- FUNCION: Suma al inventario la cantidad comprada
+-- 3. FUNCION: Suma al inventario la cantidad comprada
 CREATE OR REPLACE FUNCTION fruteria.sumar_stock()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -812,7 +812,7 @@ AFTER INSERT ON fruteria.detalle_compra
 FOR EACH ROW
 EXECUTE FUNCTION fruteria.sumar_stock();
 
---FUNCION:Evitar que se venda más producto del que hay en inventario.
+-- 4. FUNCION:Evitar que se venda más producto del que hay en inventario.
 CREATE OR REPLACE FUNCTION fruteria.validar_stock_venta()
 RETURNS TRIGGER AS $$
 DECLARE

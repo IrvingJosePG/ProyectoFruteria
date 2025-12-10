@@ -30,10 +30,29 @@ public class PuntoVenta extends javax.swing.JPanel {
         
         modeloCarrito = (DefaultTableModel) tabladecarrito.getModel();
         detallesVenta = new ArrayList<>();
-        
-        modeloCarrito.setColumnIdentifiers(new Object[]{"Producto", "Cantidad", "Precio Unitario", "Subtotal"});
         cargarClientes();
         cargarEmpleados();
+        configurarTabla();
+    }
+    
+    public void configurarTabla() {
+        String[] columnNames = {"Producto", "Cantidad", "Precio Unitario", "Subtotal"};
+    
+        this.modeloCarrito = new DefaultTableModel(columnNames, 0) {
+            // Hacemos que la tabla no sea editable directamente
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        tabladecarrito.setModel(this.modeloCarrito);
+        tabladecarrito.getTableHeader().setResizingAllowed(true);
+
+        tabladecarrito.getColumnModel().getColumn(0).setPreferredWidth(170);
+        tabladecarrito.getColumnModel().getColumn(1).setPreferredWidth(170);
+        tabladecarrito.getColumnModel().getColumn(2).setPreferredWidth(170);
+        tabladecarrito.getColumnModel().getColumn(3).setPreferredWidth(170);
     }
 
     private void buscarProducto() {
@@ -237,12 +256,13 @@ public class PuntoVenta extends javax.swing.JPanel {
         empleadosregistrados = new javax.swing.JComboBox<>();
 
         setBackground(new java.awt.Color(252, 249, 235));
+        setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Punto de Venta", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 1, 13))); // NOI18N
         setPreferredSize(new java.awt.Dimension(300, 300));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         busquedatext.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
         busquedatext.setText("Busqueda:");
-        add(busquedatext, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 10, 75, 25));
+        add(busquedatext, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 30, 75, 25));
 
         busquedafolio.setForeground(new java.awt.Color(204, 204, 204));
         busquedafolio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -256,7 +276,7 @@ public class PuntoVenta extends javax.swing.JPanel {
                 busquedafolioFocusLost(evt);
             }
         });
-        add(busquedafolio, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 10, 150, 25));
+        add(busquedafolio, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 30, 150, 25));
 
         separadorbusque.setBackground(new java.awt.Color(0, 0, 0));
         add(separadorbusque, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 35, 150, -1));
@@ -266,30 +286,30 @@ public class PuntoVenta extends javax.swing.JPanel {
         add(nombreproducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 60, -1, -1));
 
         txtnombre.setText("Nombre:");
-        add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, -1, -1));
+        add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, -1, 20));
 
         txtcategoria.setText("Categoria:");
-        add(txtcategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, -1));
+        add(txtcategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, 20));
 
         categoriaproducto.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
         categoriaproducto.setText("-----");
         add(categoriaproducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 90, -1, -1));
 
         txtcantidad.setText("Cantidad:");
-        add(txtcantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 60, -1, 20));
+        add(txtcantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 80, -1, 20));
 
         productopreciov.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
         productopreciov.setText("-----");
         add(productopreciov, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 120, -1, -1));
 
         casillavendido.setText("Puede ser vendido");
-        add(casillavendido, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 100, 150, 20));
+        add(casillavendido, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 30, 150, 20));
 
         cantidadvendida.setToolTipText("");
-        add(cantidadvendida, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 60, -1, 20));
+        add(cantidadvendida, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 80, 70, 20));
 
         txtprecioventa.setText("Precio Venta:");
-        add(txtprecioventa, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, -1, -1));
+        add(txtprecioventa, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, -1, 20));
 
         separadorcarrito.setForeground(new java.awt.Color(0, 0, 0));
         add(separadorcarrito, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 180, 700, -1));
@@ -307,7 +327,7 @@ public class PuntoVenta extends javax.swing.JPanel {
         ));
         jScrollPane1.setViewportView(tabladecarrito);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 490, 100));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 680, 100));
 
         txttotalventa.setText("Total Venta:");
         add(txttotalventa, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, -1, -1));
@@ -342,7 +362,7 @@ public class PuntoVenta extends javax.swing.JPanel {
             .addComponent(finalizarventa, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
         );
 
-        add(panelfinalizarventa, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 340, 160, 25));
+        add(panelfinalizarventa, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 340, 160, 25));
 
         pnlcarrito.setBackground(new java.awt.Color(124, 123, 174));
 
@@ -368,7 +388,7 @@ public class PuntoVenta extends javax.swing.JPanel {
             .addComponent(agregaralcarrito, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
         );
 
-        add(pnlcarrito, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 140, 160, 25));
+        add(pnlcarrito, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 130, 160, 25));
 
         pnlbuscar.setBackground(new java.awt.Color(124, 123, 174));
 
@@ -399,10 +419,10 @@ public class PuntoVenta extends javax.swing.JPanel {
             .addComponent(buscar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
         );
 
-        add(pnlbuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 10, 100, 25));
+        add(pnlbuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 30, 100, 25));
 
         txtpreciocompra.setText("Precio Compra:");
-        add(txtpreciocompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, -1, -1));
+        add(txtpreciocompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, -1, 20));
 
         productoprecioc.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
         productoprecioc.setText("-----");

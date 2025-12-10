@@ -21,7 +21,13 @@ public class InventarioProducto extends javax.swing.JPanel {
     public void configurarTabla() {
         String[] columnNames = {"ID", "Nombre", "Categoria", "U. Medida", "Stock" , "Precio C", "Precio V"};
 
-        this.modeloProducto = new DefaultTableModel(columnNames, 0); 
+        this.modeloProducto = new DefaultTableModel(columnNames, 0) {
+            // Hacemos que la tabla no sea editable directamente
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         
         tableproductos.setModel(this.modeloProducto);
         tableproductos.getTableHeader().setResizingAllowed(true);
@@ -110,8 +116,11 @@ public class InventarioProducto extends javax.swing.JPanel {
         textunidadmedida = new javax.swing.JLabel();
         unidadmedidafield = new javax.swing.JComboBox<>();
         cantidadstock = new javax.swing.JTextField();
+        pnlactualizar = new javax.swing.JPanel();
+        actualizart = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(252, 249, 235));
+        setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder(null, "Inventario de Productos", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 1, 13)))); // NOI18N
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tableproductos.setModel(new javax.swing.table.DefaultTableModel(
@@ -132,10 +141,10 @@ public class InventarioProducto extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(tableproductos);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 15, 660, 150));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 25, 660, 150));
 
         separador.setForeground(new java.awt.Color(0, 0, 0));
-        add(separador, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 170, 700, -1));
+        add(separador, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 185, 700, -1));
 
         pnleditar.setBackground(new java.awt.Color(124, 123, 174));
 
@@ -161,7 +170,7 @@ public class InventarioProducto extends javax.swing.JPanel {
             .addComponent(buttonsave, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
         );
 
-        add(pnleditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 180, 150, 25));
+        add(pnleditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 200, 150, 25));
 
         pnleliminar.setBackground(new java.awt.Color(124, 123, 174));
 
@@ -187,7 +196,7 @@ public class InventarioProducto extends javax.swing.JPanel {
             .addComponent(buttondelete, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
         );
 
-        add(pnleliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 180, 150, 25));
+        add(pnleliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 200, 150, 25));
 
         pnllimpiar.setBackground(new java.awt.Color(124, 123, 174));
 
@@ -213,55 +222,55 @@ public class InventarioProducto extends javax.swing.JPanel {
             .addComponent(buttonclear, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
         );
 
-        add(pnllimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(345, 180, 150, 25));
+        add(pnllimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 200, 150, 25));
 
         txtnombre.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
         txtnombre.setText("Nombre:");
-        add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 220, 75, 25));
+        add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 250, 75, 25));
 
         txtcodigo.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
         txtcodigo.setText("Codigo:");
-        add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 250, 75, 25));
+        add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 290, 75, 25));
 
         textcat.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
         textcat.setText("Categoria:");
-        add(textcat, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 280, 75, 25));
+        add(textcat, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 320, 75, 25));
 
         txtcantidad.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
         txtcantidad.setText("Existencia:");
-        add(txtcantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 310, 75, 25));
+        add(txtcantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 350, 75, 25));
 
         txtpreciov.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
         txtpreciov.setText("Precio Venta:");
-        add(txtpreciov, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 250, 100, 25));
+        add(txtpreciov, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 290, 100, 25));
 
         txtprecioc.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
         txtprecioc.setText("Precio Compra:");
-        add(txtprecioc, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 220, 110, 25));
+        add(txtprecioc, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 260, 110, 25));
 
         fieldproducto.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         fieldproducto.setBorder(null);
-        add(fieldproducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 220, 150, 25));
+        add(fieldproducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 250, 150, 25));
 
         fieldcodigo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         fieldcodigo.setBorder(null);
-        add(fieldcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 250, 150, 25));
+        add(fieldcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 290, 150, 25));
 
         categorias.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Fruta", "Verdura", "Otros" }));
         categorias.setBorder(null);
-        add(categorias, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 280, 150, 25));
+        add(categorias, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 320, 150, 25));
 
         precioc.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         precioc.setBorder(null);
-        add(precioc, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 220, 70, 25));
+        add(precioc, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 260, 70, 25));
 
         preciov.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         preciov.setBorder(null);
-        add(preciov, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 250, 70, 25));
+        add(preciov, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 290, 70, 25));
 
         textunidadmedida.setFont(new java.awt.Font("PT Sans", 0, 16)); // NOI18N
         textunidadmedida.setText("Unidad de Medida:");
-        add(textunidadmedida, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 280, 150, 25));
+        add(textunidadmedida, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 320, 150, 25));
 
         unidadmedidafield.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pieza", "kilogramo", "otro" }));
         unidadmedidafield.addActionListener(new java.awt.event.ActionListener() {
@@ -269,11 +278,37 @@ public class InventarioProducto extends javax.swing.JPanel {
                 unidadmedidafieldActionPerformed(evt);
             }
         });
-        add(unidadmedidafield, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 310, 175, 25));
+        add(unidadmedidafield, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 350, 175, 25));
 
         cantidadstock.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         cantidadstock.setBorder(null);
-        add(cantidadstock, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 310, 150, 25));
+        add(cantidadstock, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 350, 150, 25));
+
+        pnlactualizar.setBackground(new java.awt.Color(124, 123, 174));
+
+        actualizart.setBackground(new java.awt.Color(124, 123, 174));
+        actualizart.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
+        actualizart.setForeground(new java.awt.Color(255, 255, 255));
+        actualizart.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        actualizart.setText("Acutalizar Tabla");
+        actualizart.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                actualizartMouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlactualizarLayout = new javax.swing.GroupLayout(pnlactualizar);
+        pnlactualizar.setLayout(pnlactualizarLayout);
+        pnlactualizarLayout.setHorizontalGroup(
+            pnlactualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(actualizart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        pnlactualizarLayout.setVerticalGroup(
+            pnlactualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(actualizart, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+        );
+
+        add(pnlactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 200, 150, 25));
     }// </editor-fold>//GEN-END:initComponents
 
     private void tableproductosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableproductosMouseClicked
@@ -397,8 +432,14 @@ public class InventarioProducto extends javax.swing.JPanel {
 
     }//GEN-LAST:event_unidadmedidafieldActionPerformed
 
+    private void actualizartMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_actualizartMouseClicked
+        configurarTabla();
+        cargarDatosTabla();
+    }//GEN-LAST:event_actualizartMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel actualizart;
     private javax.swing.JLabel buttonclear;
     private javax.swing.JLabel buttondelete;
     private javax.swing.JLabel buttonsave;
@@ -407,6 +448,7 @@ public class InventarioProducto extends javax.swing.JPanel {
     private javax.swing.JTextField fieldcodigo;
     private javax.swing.JTextField fieldproducto;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel pnlactualizar;
     private javax.swing.JPanel pnleditar;
     private javax.swing.JPanel pnleliminar;
     private javax.swing.JPanel pnllimpiar;
