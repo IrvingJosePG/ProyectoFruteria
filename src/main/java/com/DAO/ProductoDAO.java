@@ -67,7 +67,8 @@ public class ProductoDAO {
     
     // Archivo: ProductoDAO.java
 
-    public int guardarProducto(Producto p) throws SQLException {
+    public boolean guardarProducto(Producto p) throws SQLException {
+        boolean exito = false;
         String sql = "INSERT INTO fruteria.producto (descripcion, categoria, unidad_medida, existencia, precio_c, precio_v) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = Conexion.getInstance().getConnection();
@@ -81,16 +82,7 @@ public class ProductoDAO {
             ps.setDouble(6, p.getPrecio_v());
 
             int filasAfectadas = ps.executeUpdate();
-
-            if (filasAfectadas > 0) {
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        return rs.getInt(1); // Devuelve el código generado
-                    }
-                }
-            }
-            return -1; // Devuelve -1 si falla
-
+            return filasAfectadas > 0;
         } catch (SQLException e) {
             throw e;
         }

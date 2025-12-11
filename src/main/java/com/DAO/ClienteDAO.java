@@ -51,10 +51,11 @@ public class ClienteDAO {
         // Consulta unificada: JOIN con ambas tablas de subtipo para obtener el nombre/razón social
         String sql = "SELECT c.id_c, c.rfc, c.domicilio, c.telefono, " +
                      "   COALESCE(pf.nombre, pm.razon_social) AS nombre, " +
-                     "   CASE WHEN pf.id_c IS NOT NULL THEN 'Fisica' ELSE 'Moral' END AS tipo_cliente " +
+                     "   CASE WHEN pf.id_c IS NOT NULL THEN 'Fisica' ELSE 'Moral' END AS tipo_cliente, c.estado " +
                      "FROM fruteria.cliente c " +
                      "LEFT JOIN fruteria.p_fisica pf ON c.id_c = pf.id_c " +
                      "LEFT JOIN fruteria.p_moral pm ON c.id_c = pm.id_c " +
+                     "WHERE c.estado = TRUE " +
                      "ORDER BY c.id_c";
 
         try {
@@ -69,13 +70,12 @@ public class ClienteDAO {
                     c.setDomicilio(rs.getString("domicilio"));
                     c.setTelefono(rs.getString("telefono"));
                     c.setTipo(rs.getString("tipo_cliente"));
+                    c.setEstado(rs.getBoolean("estado"));
 
                     // Asigna el nombre completo (nombre o razón social)
                     if (c.getTipo().equals("Fisica")) {
-                         // El nombre completo se almacena en el campo 'nombre' del modelo para simplificar la JTable
-                        String[] partesNombre = rs.getString("nombre").split(" ");
-                        c.setNombre(partesNombre[0]); 
-                        // Los apellidos quedan nulos en esta lista simple, se cargan en la búsqueda detallada
+                         // El nombre se almacena en el campo 'nombre' del modelo para simplificar la JTable
+                        c.setNombre(rs.getString("nombre"));
                     } else {
                         c.setRazonSocial(rs.getString("nombre"));
                     }
@@ -194,7 +194,7 @@ public class ClienteDAO {
         boolean exito = false;
 
         // SQL para tabla principal (cliente) - ASUMIMOS que RFC se puede actualizar
-        String sql_cliente = "UPDATE fruteria.cliente SET rfc = ?, domicilio = ?, telefono = ? WHERE id_c = ?";
+        String sql_cliente = "UPDATE fruteria.cliente SET rfc = ?, domicilio = ?, telefono = ? , estado = ? WHERE id_c = ?";
 
         // SQL para subtipo (p_fisica)
         String sql_pfisica = "UPDATE fruteria.p_fisica SET nombre = ? WHERE id_c = ?";
@@ -211,7 +211,8 @@ public class ClienteDAO {
                 ps_c.setString(1, cliente.getRfc());
                 ps_c.setString(2, cliente.getDomicilio());
                 ps_c.setString(3, cliente.getTelefono());
-                ps_c.setInt(4, cliente.getId_c());
+                ps_c.setBoolean(4, cliente.isEstado());
+                ps_c.setInt(5, cliente.getId_c());
                 ps_c.executeUpdate();
             }
 

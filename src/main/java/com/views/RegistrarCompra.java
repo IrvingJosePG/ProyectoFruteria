@@ -40,7 +40,6 @@ public class RegistrarCompra extends javax.swing.JPanel {
         modeloCarrito = (DefaultTableModel) tablecompraproducto.getModel();
         detallesCompra = new ArrayList<>();
         fechacompra.setDate(new Date());
-        modeloCarrito.setColumnIdentifiers(new Object[]{"Codigo","Producto", "Cantidad", "Costo Unitario", "Subtotal"});
         cargarProveedores();
         cargarEmpleados();
         configurarTabla();
@@ -98,8 +97,7 @@ public class RegistrarCompra extends javax.swing.JPanel {
         
          // 2. Leer Costo Unitario ingresado (CRÍTICO: No usar el precio DB)
         try {
-            String costoStr = costounitario.getText().trim();
-            costoUnitario = Double.parseDouble(costoStr);
+            costoUnitario = productoEncontrado.getPrecio_c();
             if (costoUnitario <= 0) {
                  JOptionPane.showMessageDialog(this, "El costo unitario debe ser mayor a cero.", "Advertencia", JOptionPane.WARNING_MESSAGE);
                  return;
@@ -182,7 +180,6 @@ public class RegistrarCompra extends javax.swing.JPanel {
     private void limpiarCamposDetalle() {
         codigop.setText("");
         cantidadcomprada.setValue(1); // Reset a 1, no a 0
-        costounitario.setText("");
     }
     
     // Limpia todo el carrito y la interfaz
@@ -220,9 +217,8 @@ public class RegistrarCompra extends javax.swing.JPanel {
         textdetalleproducto = new javax.swing.JLabel();
         textcodigo = new javax.swing.JLabel();
         textcantidad = new javax.swing.JLabel();
-        textcosto = new javax.swing.JLabel();
         registrarcompra = new javax.swing.JPanel();
-        registrarc = new javax.swing.JLabel();
+        registarcompras = new javax.swing.JLabel();
         buttonclean = new javax.swing.JPanel();
         limpiarcampos = new javax.swing.JLabel();
         carrito = new javax.swing.JPanel();
@@ -233,7 +229,6 @@ public class RegistrarCompra extends javax.swing.JPanel {
         totalventa = new javax.swing.JLabel();
         cantidadcomprada = new javax.swing.JSpinner();
         codigop = new javax.swing.JTextField();
-        costounitario = new javax.swing.JTextField();
 
         setBackground(new java.awt.Color(252, 249, 235));
         setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Registrar Nueva Compra", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 1, 13))); // NOI18N
@@ -262,29 +257,26 @@ public class RegistrarCompra extends javax.swing.JPanel {
         add(textdetalleproducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, -1, 20));
 
         textcodigo.setText("Código Producto:");
-        add(textcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, -1, -1));
+        add(textcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, -1, 25));
 
         textcantidad.setText("Cantidad Comprada:");
-        add(textcantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 200, -1, -1));
-
-        textcosto.setText("Costo Unitario:");
-        add(textcosto, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 230, -1, -1));
+        add(textcantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 220, -1, 25));
 
         registrarcompra.setBackground(new java.awt.Color(124, 123, 174));
 
-        registrarc.setBackground(new java.awt.Color(124, 123, 174));
-        registrarc.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
-        registrarc.setForeground(new java.awt.Color(255, 255, 255));
-        registrarc.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        registrarc.setText("Registrar Compra");
-        registrarc.addMouseListener(new java.awt.event.MouseAdapter() {
+        registarcompras.setBackground(new java.awt.Color(124, 123, 174));
+        registarcompras.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
+        registarcompras.setForeground(new java.awt.Color(255, 255, 255));
+        registarcompras.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        registarcompras.setText("Registrar Compra");
+        registarcompras.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                registrarcMouseClicked(evt);
+                registarcomprasMouseClicked(evt);
             }
         });
-        registrarc.addKeyListener(new java.awt.event.KeyAdapter() {
+        registarcompras.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                registrarcKeyPressed(evt);
+                registarcomprasKeyPressed(evt);
             }
         });
 
@@ -292,11 +284,11 @@ public class RegistrarCompra extends javax.swing.JPanel {
         registrarcompra.setLayout(registrarcompraLayout);
         registrarcompraLayout.setHorizontalGroup(
             registrarcompraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(registrarc, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(registarcompras, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         registrarcompraLayout.setVerticalGroup(
             registrarcompraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(registrarc, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+            .addComponent(registarcompras, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
         );
 
         add(registrarcompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(125, 350, 160, 30));
@@ -378,12 +370,11 @@ public class RegistrarCompra extends javax.swing.JPanel {
 
         totalventa.setText("0.0");
         add(totalventa, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 300, -1, -1));
-        add(cantidadcomprada, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 200, 100, -1));
-        add(codigop, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 170, 100, -1));
-        add(costounitario, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 230, 100, -1));
+        add(cantidadcomprada, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 220, 100, 25));
+        add(codigop, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 170, 100, 25));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void registrarcMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_registrarcMouseClicked
+    private void registarcomprasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_registarcomprasMouseClicked
         // 1. Validaciones
         if (detallesCompra.isEmpty()) {
             JOptionPane.showMessageDialog(this, "El carrito de compra está vacío.", "Advertencia", JOptionPane.WARNING_MESSAGE);
@@ -432,11 +423,11 @@ public class RegistrarCompra extends javax.swing.JPanel {
         } catch (SQLException ex) {
             Logger.getLogger(RegistrarCompra.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_registrarcMouseClicked
+    }//GEN-LAST:event_registarcomprasMouseClicked
 
-    private void registrarcKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_registrarcKeyPressed
+    private void registarcomprasKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_registarcomprasKeyPressed
         // No se usa
-    }//GEN-LAST:event_registrarcKeyPressed
+    }//GEN-LAST:event_registarcomprasKeyPressed
 
     private void limpiarcamposMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_limpiarcamposMouseClicked
         limpiarTodo();
@@ -456,20 +447,18 @@ public class RegistrarCompra extends javax.swing.JPanel {
     private javax.swing.JSpinner cantidadcomprada;
     private javax.swing.JPanel carrito;
     private javax.swing.JTextField codigop;
-    private javax.swing.JTextField costounitario;
     private javax.swing.JComboBox<com.model.Empleado> empleadosregistrados;
     private com.toedter.calendar.JDateChooser fechacompra;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel limpiarcampos;
     private javax.swing.JComboBox<com.model.Proveedor> proveedoresregistrados;
-    private javax.swing.JLabel registrarc;
+    private javax.swing.JLabel registarcompras;
     private javax.swing.JPanel registrarcompra;
     private javax.swing.JTable tablecompraproducto;
     private javax.swing.JLabel textcantidad;
     private javax.swing.JLabel textcarrito;
     private javax.swing.JLabel textcodigo;
     private javax.swing.JLabel textcompra;
-    private javax.swing.JLabel textcosto;
     private javax.swing.JLabel textdetalleproducto;
     private javax.swing.JLabel textempleado;
     private javax.swing.JLabel textfecha;

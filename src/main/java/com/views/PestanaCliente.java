@@ -26,7 +26,7 @@ public class PestanaCliente extends javax.swing.JPanel {
     }
     
     public void configurarTabla() {
-        String[] columnNames = {"ID", "RFC", "TIPO", "Nombre/Razon Social", "Telefono", "Domicilio"};
+        String[] columnNames = {"ID", "RFC", "TIPO", "Nombre/Razon Social", "Telefono", "Domicilio","Estado"};
     
         this.modeloclientes = new DefaultTableModel(columnNames, 0) {
             // Hacemos que la tabla no sea editable directamente
@@ -44,7 +44,8 @@ public class PestanaCliente extends javax.swing.JPanel {
         tablaclientes.getColumnModel().getColumn(2).setPreferredWidth(50);
         tablaclientes.getColumnModel().getColumn(3).setPreferredWidth(180);
         tablaclientes.getColumnModel().getColumn(4).setPreferredWidth(100); 
-        tablaclientes.getColumnModel().getColumn(5).setPreferredWidth(160); 
+        tablaclientes.getColumnModel().getColumn(5).setPreferredWidth(160);
+        tablaclientes.getColumnModel().getColumn(6).setPreferredWidth(60);
     }
     
      public void cargarClientes() {
@@ -56,7 +57,7 @@ public class PestanaCliente extends javax.swing.JPanel {
             // 3. Iterar sobre la lista y añadir cada cliente como una fila
             for (Cliente cliente : clientes) {
                 // Definimos el arreglo de 6 elementos para las 6 columnas
-                Object[] rowData = new Object[6];
+                Object[] rowData = new Object[7];
                 // Columna 0: ID
                 rowData[0] = cliente.getId_c();
                 // Columna 1: RFC
@@ -79,7 +80,7 @@ public class PestanaCliente extends javax.swing.JPanel {
                 rowData[4] = cliente.getTelefono(); 
                 // Columna 5: DOMICILIO
                 rowData[5] = cliente.getDomicilio(); 
-
+                rowData[6] = cliente.isEstado();
                 modeloclientes.addRow(rowData);
             }
             
@@ -100,7 +101,7 @@ public class PestanaCliente extends javax.swing.JPanel {
             cliente = clientedao.obtenerClienteCompletoPorId(id_cliente);
             // 3. Iterar sobre la el cliente como una fila
                 // Definimos el arreglo de 6 elementos para las 6 columnas
-                Object[] rowData = new Object[6];
+                Object[] rowData = new Object[7];
                 // Columna 0: ID
                 rowData[0] = cliente.getId_c();
                 // Columna 1: RFC
@@ -123,7 +124,8 @@ public class PestanaCliente extends javax.swing.JPanel {
                 rowData[4] = cliente.getTelefono(); 
                 // Columna 5: DOMICILIO
                 rowData[5] = cliente.getDomicilio(); 
-
+                rowData[6] = cliente.isEstado();
+                
                 modeloclientes.addRow(rowData);  
                 
                 camporfc.setText(cliente.getRfc());
@@ -199,6 +201,11 @@ public class PestanaCliente extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tablaclientes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tablaclientesMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tablaclientes);
 
         add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, 660, 180));
@@ -305,7 +312,7 @@ public class PestanaCliente extends javax.swing.JPanel {
         texttelefono.setText("Teléfono:");
         add(texttelefono, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 350, -1, 25));
 
-        tipocliente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione", "Persona Fisica", "Persona Moral" }));
+        tipocliente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione", "Fisica", "Moral" }));
         tipocliente.setBorder(null);
         add(tipocliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 390, 150, 25));
 
@@ -325,14 +332,19 @@ public class PestanaCliente extends javax.swing.JPanel {
         add(textbusqueda, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 270, -1, 25));
 
         busquedanombre.setForeground(new java.awt.Color(153, 153, 153));
-        busquedanombre.setText("Escribir RFC o Nombre");
+        busquedanombre.setText("Escribe ID, RFC o Nombre");
         busquedanombre.setBorder(null);
         busquedanombre.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 busquedanombreMouseClicked(evt);
             }
         });
-        add(busquedanombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 270, 150, 25));
+        busquedanombre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                busquedanombreActionPerformed(evt);
+            }
+        });
+        add(busquedanombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 270, 170, 25));
 
         jLabel1.setText("Estado:");
         add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 390, -1, 25));
@@ -356,11 +368,15 @@ public class PestanaCliente extends javax.swing.JPanel {
                     cliente.setNombre(null);
                 }
             
+            String estadoTexto = campoestado.getSelectedItem().toString();
+            cliente.setEstado(estadoTexto.equals("Activo"));
+
             // 3. Llamar al método del DAO para ejecutar la actualización
             if (clientedao.actualizarDatosCliente(cliente)) {
                 javax.swing.JOptionPane.showMessageDialog(null, "Cliente actualizado con éxito.", "Actualización", javax.swing.JOptionPane.INFORMATION_MESSAGE);
                 configurarTabla();
                 cargarClientes();
+                limpiarCampos();
             } else {
                 javax.swing.JOptionPane.showMessageDialog(null, "No se pudo actualizar el cliente.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
@@ -380,6 +396,7 @@ public class PestanaCliente extends javax.swing.JPanel {
                  javax.swing.JOptionPane.showMessageDialog(null, "Cliente Eliminado con éxito.", "Actualización", javax.swing.JOptionPane.INFORMATION_MESSAGE);
                     configurarTabla();
                     cargarClientes();
+                    limpiarCampos();
              }else{
                  javax.swing.JOptionPane.showMessageDialog(null, "No se pudo eliminar el cliente.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
@@ -392,6 +409,77 @@ public class PestanaCliente extends javax.swing.JPanel {
         busquedanombre.setText("");
         busquedanombre.setForeground(Color.BLACK);
     }//GEN-LAST:event_busquedanombreMouseClicked
+
+    private void tablaclientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaclientesMouseClicked
+        int fila = tablaclientes.getSelectedRow();
+        if (fila == -1) return;
+
+        try {
+            int codigo = (int) modeloclientes.getValueAt(fila, 0);
+            String rfc = (String) modeloclientes.getValueAt(fila, 1);
+            String tipo = (String) modeloclientes.getValueAt(fila, 2);
+            String nombre = (String) modeloclientes.getValueAt(fila, 3);
+            String telefono = (String) modeloclientes.getValueAt(fila, 4);
+            String domicilio = (String) modeloclientes.getValueAt(fila, 5);
+            boolean estado = (boolean) modeloclientes.getValueAt(fila, 6);
+
+            // Rellenar campos
+            campoidcliente.setText(String.valueOf(codigo));
+            camporfc.setText(rfc);
+            camponombre.setText(nombre);
+            campotelefono.setText(telefono);
+            campodomicilio.setText(domicilio);
+
+            if (tipo.equals("Fisica"))
+                tipocliente.setSelectedIndex(1);
+            else
+                tipocliente.setSelectedIndex(2);
+
+            campoestado.setSelectedIndex(estado ? 1 : 2);
+
+            // Asignar al objeto cliente
+            cliente = new Cliente();
+            cliente.setId_c(codigo);
+            cliente.setRfc(rfc);
+            cliente.setTelefono(telefono);
+            cliente.setDomicilio(domicilio);
+            cliente.setEstado(estado);
+            cliente.setTipo(tipo);
+
+            if (tipo.equals("Fisica")) {
+                cliente.setNombre(nombre);
+                cliente.setRazonSocial(null);
+            } else {
+                cliente.setRazonSocial(nombre);
+                cliente.setNombre(null);
+            }
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, 
+                "Error al cargar datos de la fila: " + ex.getMessage(), 
+                "Error de Lectura", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_tablaclientesMouseClicked
+
+    private void busquedanombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_busquedanombreActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_busquedanombreActionPerformed
+
+    private void limpiarCampos() {
+        campoidcliente.setText("");
+        camporfc.setText("");
+        camponombre.setText("");
+        campodomicilio.setText("");
+        campotelefono.setText("");
+
+        tipocliente.setSelectedIndex(0); // "Seleccione"
+        campoestado.setSelectedIndex(0); // "Seleccione"
+
+        busquedanombre.setText("Escribir RFC o Nombre");
+        busquedanombre.setForeground(new java.awt.Color(153,153,153));
+
+        cliente = null; // Limpia el objeto para evitar errores
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

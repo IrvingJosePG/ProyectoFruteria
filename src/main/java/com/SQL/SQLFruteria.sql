@@ -594,12 +594,16 @@ SELECT setval('fruteria.folio_compra_seq', (SELECT COALESCE(MAX(folio_c), 0) FRO
 ALTER TABLE fruteria.compra	
 ALTER COLUMN folio_c SET DEFAULT nextval('fruteria.folio_compra_seq');
 
+-- Producto
+CREATE SEQUENCE fruteria.codigo_producto_seq START 1;
+SELECT setval('fruteria.codigo_producto_seq', (SELECT COALESCE(MAX(codigo), 0) FROM fruteria.producto), true);
+ALTER TABLE fruteria.producto
+ALTER COLUMN codigo SET DEFAULT nextval('fruteria.codigo_producto_seq');
 
 -- 6. CREACIÓN DE FUNCIONES (PL/pgSQL)
 -------------------------------------------------------------
 
--- FUNCIÓN 1: registra un producto en detalle_venta y descuenta su existencia.
--- Utiliza la cláusula FOR UPDATE para prevenir errores de stock en entornos concurrentes.
+-- FUNCIÓN 1: registra un producto en detalle_venta SIN tocar inventario.
 CREATE OR REPLACE FUNCTION fruteria.registrar_detalle_y_stock(
     p_folio_v INTEGER,
     p_codigo INTEGER,
@@ -607,35 +611,16 @@ CREATE OR REPLACE FUNCTION fruteria.registrar_detalle_y_stock(
     p_observaciones VARCHAR(50)
 )
 RETURNS VOID AS $$
-DECLARE
-    v_existencia_actual INTEGER;
 BEGIN
-    -- Verificar existencia antes de la venta
-    -- Bloquear y obtener la existencia actual. El FOR UPDATE previene 
-    -- que otras transacciones modifiquen la existencia hasta que esta termine.
-    SELECT existencia INTO v_existencia_actual FROM fruteria.producto WHERE codigo = p_codigo FOR UPDATE;
- 
-    -- Verificar que el producto existe y que la cantidad solicitada no supera el stock.
-    IF v_existencia_actual IS NULL THEN
-        RAISE EXCEPTION 'Error: El producto con código % no existe.', p_codigo;
-    ELSIF v_existencia_actual < p_cantidad THEN
-        RAISE EXCEPTION 'Error de Stock: Solo quedan % unidades del producto % (se solicitó %).', 
-            v_existencia_actual, p_codigo, p_cantidad;
-    END IF;
-
     -- 1. INSERTAR en la tabla detalle_venta
     INSERT INTO fruteria.detalle_venta (codigo, folio_v, observaciones, cantidad)
     VALUES (p_codigo, p_folio_v, p_observaciones, p_cantidad);
 
-    -- 2. ACTUALIZAR la existencia del producto (Descuento de stock)
-    UPDATE fruteria.producto
-    SET existencia = existencia - p_cantidad
-    WHERE codigo = p_codigo;
-
+    -- El trigger tr_restar_stock se encargará de descontar el stock
 END;
 $$ LANGUAGE plpgsql;
 
--- FUNCIÓN 2: Maneja la transacción completa de una Compra.
+-- FUNCIÓN 2: Maneja la transacció de una Compra sin aumentar stock.
 CREATE OR REPLACE FUNCTION fruteria.registrar_detalle_compra_y_stock(
     p_folio_c INTEGER,
     p_codigo_prod INTEGER,
@@ -647,34 +632,46 @@ BEGIN
     INSERT INTO fruteria.detalle_compra (folio_c, codigo, cantidad)
     VALUES (p_folio_c, p_codigo_prod, p_cantidad);
 
-    -- 2. Actualizar existencia en producto
-    UPDATE fruteria.producto
-    SET existencia = existencia + p_cantidad
-    WHERE codigo = p_codigo_prod;
-
+    -- El trigger tr_sumar_stock se encargará del stock
 END;
 $$ LANGUAGE plpgsql;
 
--- FUNCIÓN 3: BUSCAR ID DE CLIENTE POR RFC O NOMBRE
+-- FUNCIÓN 3: BUSCAR ID DE CLIENTE POR RFC O NOMBRE, ID
 -- Devuelve el ID del cliente o NULL si no se encuentra.
 CREATE OR REPLACE FUNCTION fruteria.obtener_id_cliente_por_identificador(
-    p_identificador TEXT -- Puede ser RFC, Nombre, o Razón Social
+    p_identificador TEXT
 )
 RETURNS INTEGER AS $$
 DECLARE
     v_id_c INTEGER;
+    v_numero INTEGER;
 BEGIN
-    -- 1. Buscar en la tabla principal de cliente por RFC (esto debería ser la clave)
+    
+    BEGIN
+        v_numero := p_identificador::INTEGER;
+
+        SELECT id_c INTO v_id_c
+        FROM fruteria.cliente
+        WHERE id_c = v_numero;
+
+        IF v_id_c IS NOT NULL THEN
+            RETURN v_id_c;
+        END IF;
+    EXCEPTION
+        WHEN invalid_text_representation THEN
+            NULL;
+    END;
+
+    
     SELECT id_c INTO v_id_c
     FROM fruteria.cliente
-    WHERE rfc ILIKE '%' || p_identificador || '%' -- Búsqueda exacta o parcial del RFC
+    WHERE rfc ILIKE '%' || p_identificador || '%'
     LIMIT 1;
 
     IF v_id_c IS NOT NULL THEN
         RETURN v_id_c;
     END IF;
-    
-    -- 2. Buscar en Persona Física por nombre o apellidos
+
     SELECT id_c INTO v_id_c
     FROM fruteria.p_fisica
     WHERE nombre ILIKE '%' || p_identificador || '%'
@@ -684,13 +681,12 @@ BEGIN
         RETURN v_id_c;
     END IF;
 
-    -- 3. Buscar en Persona Moral por Razón Social
     SELECT id_c INTO v_id_c
     FROM fruteria.p_moral
     WHERE razon_social ILIKE '%' || p_identificador || '%'
     LIMIT 1;
 
-    RETURN v_id_c; -- Devuelve el ID encontrado (o NULL si no se encuentra)
+    RETURN v_id_c;
 END;
 $$ LANGUAGE plpgsql;
 

@@ -116,8 +116,8 @@ public class InventarioProducto extends javax.swing.JPanel {
         textunidadmedida = new javax.swing.JLabel();
         unidadmedidafield = new javax.swing.JComboBox<>();
         cantidadstock = new javax.swing.JTextField();
-        pnlactualizar = new javax.swing.JPanel();
-        actualizart = new javax.swing.JLabel();
+        pnlnuevop = new javax.swing.JPanel();
+        nuevop = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(252, 249, 235));
         setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder(null, "Inventario de Productos", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 1, 13)))); // NOI18N
@@ -204,7 +204,7 @@ public class InventarioProducto extends javax.swing.JPanel {
         buttonclear.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
         buttonclear.setForeground(new java.awt.Color(255, 255, 255));
         buttonclear.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        buttonclear.setText("LIMPIAR");
+        buttonclear.setText("LIMPIAR CAMPOS");
         buttonclear.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 buttonclearMouseClicked(evt);
@@ -272,7 +272,7 @@ public class InventarioProducto extends javax.swing.JPanel {
         textunidadmedida.setText("Unidad de Medida:");
         add(textunidadmedida, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 320, 150, 25));
 
-        unidadmedidafield.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pieza", "kilogramo", "otro" }));
+        unidadmedidafield.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pieza", "kilogramo", "gramo", "manojo", "caja", "ramito" }));
         unidadmedidafield.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 unidadmedidafieldActionPerformed(evt);
@@ -284,31 +284,31 @@ public class InventarioProducto extends javax.swing.JPanel {
         cantidadstock.setBorder(null);
         add(cantidadstock, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 350, 150, 25));
 
-        pnlactualizar.setBackground(new java.awt.Color(124, 123, 174));
+        pnlnuevop.setBackground(new java.awt.Color(124, 123, 174));
 
-        actualizart.setBackground(new java.awt.Color(124, 123, 174));
-        actualizart.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
-        actualizart.setForeground(new java.awt.Color(255, 255, 255));
-        actualizart.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        actualizart.setText("Acutalizar Tabla");
-        actualizart.addMouseListener(new java.awt.event.MouseAdapter() {
+        nuevop.setBackground(new java.awt.Color(124, 123, 174));
+        nuevop.setFont(new java.awt.Font("PT Sans", 1, 16)); // NOI18N
+        nuevop.setForeground(new java.awt.Color(255, 255, 255));
+        nuevop.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        nuevop.setText("NUEVO PRODUCTO");
+        nuevop.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                actualizartMouseClicked(evt);
+                nuevopMouseClicked(evt);
             }
         });
 
-        javax.swing.GroupLayout pnlactualizarLayout = new javax.swing.GroupLayout(pnlactualizar);
-        pnlactualizar.setLayout(pnlactualizarLayout);
-        pnlactualizarLayout.setHorizontalGroup(
-            pnlactualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(actualizart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        javax.swing.GroupLayout pnlnuevopLayout = new javax.swing.GroupLayout(pnlnuevop);
+        pnlnuevop.setLayout(pnlnuevopLayout);
+        pnlnuevopLayout.setHorizontalGroup(
+            pnlnuevopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(nuevop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        pnlactualizarLayout.setVerticalGroup(
-            pnlactualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(actualizart, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+        pnlnuevopLayout.setVerticalGroup(
+            pnlnuevopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(nuevop, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
         );
 
-        add(pnlactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 200, 150, 25));
+        add(pnlnuevop, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 200, 150, 25));
     }// </editor-fold>//GEN-END:initComponents
 
     private void tableproductosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableproductosMouseClicked
@@ -354,43 +354,47 @@ public class InventarioProducto extends javax.swing.JPanel {
 
     private void buttonsaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonsaveMouseClicked
         try {
-            // VALIDACIÓN BÁSICA
-            if (fieldproducto.getText().isEmpty() || precioc.getText().isEmpty() || preciov.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Rellena todos los campos obligatorios.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            // Validación básica
+            if (fieldproducto.getText().isEmpty() || 
+                precioc.getText().isEmpty() || 
+                preciov.getText().isEmpty()) {
+
+                JOptionPane.showMessageDialog(this, "Rellena todos los campos obligatorios.");
                 return;
             }
 
-            // Verificamos que el usuario haya seleccionado un producto de la tabla
-            if (fieldcodigo.isEnabled() || fieldcodigo.getText().equals("AUTOMÁTICO") || fieldcodigo.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Para guardar cambios, primero selecciona un producto de la tabla.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            // RECOPILACIÓN DE DATOS
+            // Crear producto con datos comunes
             Producto producto = new Producto();
-
-            producto.setCodigo(Integer.parseInt(fieldcodigo.getText()));
-            // Atributos modificables
             producto.setDescripcion(fieldproducto.getText());
             producto.setCategoria(categorias.getSelectedItem().toString());
             producto.setUnidad_medida(unidadmedidafield.getSelectedItem().toString());
             producto.setPrecio_c(Double.parseDouble(precioc.getText()));
             producto.setPrecio_v(Double.parseDouble(preciov.getText()));
 
-            if (productoDAO.actualizarAtributosProducto(producto)) {
-                JOptionPane.showMessageDialog(this, "Producto ACTUALIZADO con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            // DECISIÓN: NUEVO O EXISTENTE
+            if (fieldcodigo.getText().equals("AUTOMÁTICO")) {
+
+            if (productoDAO.guardarProducto(producto)) {
+                    JOptionPane.showMessageDialog(this, "Producto registrado.");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error al registrar el producto.");
+                }
+
             } else {
-                JOptionPane.showMessageDialog(this, "No se encontró el producto para actualizar.", "Error", JOptionPane.ERROR_MESSAGE);
+                producto.setCodigo(Integer.parseInt(fieldcodigo.getText()));
+                if (productoDAO.actualizarAtributosProducto(producto)) {
+                    JOptionPane.showMessageDialog(this, "Producto actualizado con éxito.");
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se encontró el producto.");
+                }
             }
 
             limpiarCampos();
             configurarTabla();
             cargarDatosTabla();
 
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Error de formato en Código o Precio: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error SQL: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }//GEN-LAST:event_buttonsaveMouseClicked
 
@@ -432,14 +436,18 @@ public class InventarioProducto extends javax.swing.JPanel {
 
     }//GEN-LAST:event_unidadmedidafieldActionPerformed
 
-    private void actualizartMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_actualizartMouseClicked
-        configurarTabla();
-        cargarDatosTabla();
-    }//GEN-LAST:event_actualizartMouseClicked
+    private void nuevopMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_nuevopMouseClicked
+        // Limpia los campos
+        limpiarCampos();
+        
+        fieldcodigo.setEnabled(false);
+        fieldcodigo.setText("AUTOMÁTICO");
+
+        fieldproducto.requestFocus();
+    }//GEN-LAST:event_nuevopMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel actualizart;
     private javax.swing.JLabel buttonclear;
     private javax.swing.JLabel buttondelete;
     private javax.swing.JLabel buttonsave;
@@ -448,10 +456,11 @@ public class InventarioProducto extends javax.swing.JPanel {
     private javax.swing.JTextField fieldcodigo;
     private javax.swing.JTextField fieldproducto;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JPanel pnlactualizar;
+    private javax.swing.JLabel nuevop;
     private javax.swing.JPanel pnleditar;
     private javax.swing.JPanel pnleliminar;
     private javax.swing.JPanel pnllimpiar;
+    private javax.swing.JPanel pnlnuevop;
     private javax.swing.JTextField precioc;
     private javax.swing.JTextField preciov;
     private javax.swing.JSeparator separador;
